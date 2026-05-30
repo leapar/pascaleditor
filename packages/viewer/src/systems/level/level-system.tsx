@@ -1,3 +1,5 @@
+'use client'
+
 import { type LevelNode, sceneRegistry, useScene } from '@pascal-app/core'
 import { useFrame } from '@react-three/fiber'
 import { lerp } from 'three/src/math/MathUtils.js'

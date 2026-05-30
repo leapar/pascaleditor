@@ -10,7 +10,7 @@ import {
   sceneRegistry,
   useScene,
 } from '@pascal-app/core'
-import { triggerSFX } from '@pascal-app/editor'
+import { triggerSFX, useTranslations } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -37,6 +37,7 @@ type SegmentTransform = {
 }
 
 const ChimneyTool = () => {
+  const t = useTranslations()
   const activeBuildingId = useViewer((s) => s.selection.buildingId)
   const setSelection = useViewer((s) => s.setSelection)
 
@@ -113,10 +114,11 @@ const ChimneyTool = () => {
       )
       if (!hit) return
       const state = useScene.getState()
+      const chimneyCount = Object.values(state.nodes).filter((n) => n.type === 'chimney').length
 
       const chimney = ChimneyNode.parse({
         ...chimneyDefinition.defaults(),
-        name: 'Chimney',
+        name: t('nodes.chimney.defaultName', { count: chimneyCount + 1 }),
         roofSegmentId: hit.segment.id,
         position: [hit.localX, hit.localY, hit.localZ],
         rotation: 0,

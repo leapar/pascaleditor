@@ -37,7 +37,7 @@ export const siteDefinition: NodeDefinition<typeof SiteNode> = {
   },
 
   presentation: {
-    label: 'Site',
+    label: 'nodes.site.label',
     description: 'The top-level container holding buildings, zones, and the property boundary.',
     icon: { kind: 'url', src: '/icons/site.png' },
     paletteSection: 'site',

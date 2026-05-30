@@ -354,7 +354,7 @@ export const columnDefinition: NodeDefinition<typeof ColumnNode> = {
   },
 
   presentation: {
-    label: 'Column',
+    label: 'nodes.column.label',
     description: 'A parametric column with configurable cross-section, base, and capital.',
     icon: { kind: 'url', src: '/icons/column.png' },
     paletteSection: 'structure',

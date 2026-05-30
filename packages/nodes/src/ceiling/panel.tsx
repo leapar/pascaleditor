@@ -9,6 +9,7 @@ import {
   SliderControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Edit, Move, Plus, Trash2 } from 'lucide-react'
@@ -23,6 +24,7 @@ import { useCallback, useEffect, useRef } from 'react'
  * panel can collapse into auto-derived groups.
  */
 export function CeilingPanel() {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const editingHole = useEditor((s) => s.editingHole)
@@ -149,12 +151,12 @@ export function CeilingPanel() {
     <PanelWrapper
       icon="/icons/ceiling.png"
       onClose={handleClose}
-      title={node.name || 'Ceiling'}
+      title={node.name || t('nodes.ceiling.fallbackTitle')}
       width={320}
     >
-      <PanelSection title="Height">
+      <PanelSection title={t('common.height')}>
         <SliderControl
-          label="Height"
+          label={t('common.height')}
           max={6}
           min={0}
           onChange={(v) => handleUpdate({ height: v })}
@@ -165,15 +167,15 @@ export function CeilingPanel() {
         />
 
         <div className="mt-2 grid grid-cols-3 gap-1.5 px-1 pb-1">
-          <ActionButton label="Low (2.4m)" onClick={() => handleUpdate({ height: 2.4 })} />
-          <ActionButton label="Standard (2.5m)" onClick={() => handleUpdate({ height: 2.5 })} />
-          <ActionButton label="High (3.0m)" onClick={() => handleUpdate({ height: 3.0 })} />
+          <ActionButton label={t('nodes.ceiling.heightPresets.low')} onClick={() => handleUpdate({ height: 2.4 })} />
+          <ActionButton label={t('nodes.ceiling.heightPresets.standard')} onClick={() => handleUpdate({ height: 2.5 })} />
+          <ActionButton label={t('nodes.ceiling.heightPresets.high')} onClick={() => handleUpdate({ height: 3.0 })} />
         </div>
       </PanelSection>
 
-      <PanelSection title="Info">
+      <PanelSection title={t('nodes.ceiling.area')}>
         <div className="flex items-center justify-between px-2 py-1 text-muted-foreground text-sm">
-          <span>Area</span>
+          <span>{t('nodes.ceiling.area')}</span>
           <span className="font-mono text-white">{area.toFixed(2)} m²</span>
         </div>
       </PanelSection>
@@ -187,7 +189,7 @@ export function CeilingPanel() {
                 editingHole?.nodeId === selectedId && editingHole?.holeIndex === index
               const source = node.holeMetadata?.[index]?.source ?? 'manual'
               const isAutoHole = source !== 'manual'
-              const autoLabel = source === 'elevator' ? 'Auto elevator cutout' : 'Auto stair cutout'
+              const autoLabel = source === 'elevator' ? t('nodes.ceiling.autoHoleLabel.elevator') : t('nodes.ceiling.autoHoleLabel.stair')
               return (
                 <div
                   className={`flex items-center justify-between rounded-lg border p-2 transition-colors ${
@@ -201,23 +203,23 @@ export function CeilingPanel() {
                     <p
                       className={`font-medium text-xs ${isEditing ? 'text-primary' : 'text-white'}`}
                     >
-                      Hole {index + 1} {isEditing && '(Editing)'}
+                      {t('nodes.ceiling.holeLabel', { index: index + 1 })} {isEditing && `(${t('common.done')})`}
                     </p>
                     <p className="text-[10px] text-muted-foreground">
                       {holeArea.toFixed(2)} m² · {hole.length} pts ·{' '}
-                      {isAutoHole ? autoLabel : 'Manual'}
+                      {isAutoHole ? autoLabel : t('nodes.ceiling.manual')}
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
                     {isEditing ? (
                       <ActionButton
                         className="h-7 bg-primary text-primary-foreground hover:bg-primary/90"
-                        label="Done"
+                        label={t('common.done')}
                         onClick={() => setEditingHole(null)}
                       />
                     ) : isAutoHole ? (
                       <div className="rounded-md bg-[#2C2C2E] px-2 py-1 text-[10px] text-muted-foreground">
-                        Auto
+                        {t('nodes.ceiling.auto')}
                       </div>
                     ) : (
                       <>
@@ -243,7 +245,7 @@ export function CeilingPanel() {
             })}
           </div>
         ) : (
-          <div className="px-2 py-3 text-center text-muted-foreground text-xs">No holes</div>
+          <div className="px-2 py-3 text-center text-muted-foreground text-xs">{t('nodes.ceiling.noHoles')}</div>
         )}
 
         <div className="px-1 pt-1 pb-1">
@@ -251,14 +253,14 @@ export function CeilingPanel() {
             className="w-full"
             disabled={editingHole?.nodeId === selectedId}
             icon={<Plus className="h-3.5 w-3.5" />}
-            label="Add Hole"
+            label={t('nodes.ceiling.addHole')}
             onClick={handleAddHole}
           />
         </div>
       </PanelSection>
 
       <ActionGroup>
-        <ActionButton icon={<Move className="h-3.5 w-3.5" />} label="Move" onClick={handleMove} />
+        <ActionButton icon={<Move className="h-3.5 w-3.5" />} label={t('common.move')} onClick={handleMove} />
       </ActionGroup>
     </PanelWrapper>
   )

@@ -1,3 +1,5 @@
+'use client'
+
 import {
   type AnyNodeId,
   emitter,
@@ -16,6 +18,7 @@ import {
   isValidWallSideFace,
   snapToHalf,
   triggerSFX,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useRef } from 'react'
@@ -36,6 +39,7 @@ const edgeMaterial = new LineBasicNodeMaterial({
  * Shows a rectangle cursor (green = valid, red = invalid) matching window dimensions.
  */
 const WindowTool: React.FC = () => {
+  const t = useTranslations()
   const draftRef = useRef<WindowNode | null>(null)
   const cursorGroupRef = useRef<Group>(null!)
   const edgesRef = useRef<LineSegments>(null!)
@@ -256,7 +260,7 @@ const WindowTool: React.FC = () => {
         const wall = n.parentId ? state.nodes[n.parentId as AnyNodeId] : undefined
         return wall?.parentId === levelId
       }).length
-      const name = `Window ${windowCount + 1}`
+      const name = t('nodes.window.defaultName', { count: windowCount + 1 })
 
       const node = WindowNode.parse({
         name,

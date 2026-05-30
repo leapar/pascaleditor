@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, type ItemNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import Image from 'next/image'
@@ -84,7 +86,7 @@ export const ItemTreeNode = memo(function ItemTreeNode({
   const handleStopEditing = useCallback(() => setIsEditing(false), [])
 
   const iconSrc = CATEGORY_ICONS[asset?.category ?? ''] || '/icons/couch.png'
-  const defaultName = asset?.name || 'Item'
+  const defaultName = asset?.name || 'nodeTypes.item'
   const hasChildren = children.length > 0
 
   return (

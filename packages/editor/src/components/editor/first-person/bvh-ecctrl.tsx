@@ -1,3 +1,5 @@
+'use client'
+
 import '../../../three-types'
 import { TransformControls, useKeyboardControls } from '@react-three/drei'
 import { type ThreeElements, useFrame, useThree } from '@react-three/fiber'

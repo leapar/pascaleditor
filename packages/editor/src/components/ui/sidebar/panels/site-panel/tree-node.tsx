@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, emitter, useScene } from '@pascal-app/core'
 import { ChevronRight } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'

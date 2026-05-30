@@ -1,7 +1,7 @@
 'use client'
 
 import type { DormerNode } from '@pascal-app/core'
-import { PanelSection, SegmentedControl, SliderControl, ToggleControl } from '@pascal-app/editor'
+import { PanelSection, SegmentedControl, SliderControl, ToggleControl, useTranslations } from '@pascal-app/editor'
 import { useState } from 'react'
 
 type WindowShape = DormerNode['windowShape']
@@ -28,6 +28,7 @@ export function DormerWindowSection({
   commitProp: (updates: Partial<DormerNode>) => void
   handleUpdate: (updates: Partial<DormerNode>) => void
 }) {
+  const t = useTranslations()
   const [radiusViewMode, setRadiusViewMode] = useState<WindowRadiusMode>('all')
 
   const windowShape: WindowShape = node.windowShape
@@ -56,9 +57,9 @@ export function DormerWindowSection({
 
   return (
     <>
-      <PanelSection title="Hung Wall">
+      <PanelSection title={t('nodes.dormer.hungWall')}>
         <SliderControl
-          label="Height"
+          label={t('common.height')}
           max={6}
           min={0.2}
           onChange={(v) => previewProp({ wallSkirtHeight: v })}
@@ -71,9 +72,9 @@ export function DormerWindowSection({
         />
       </PanelSection>
 
-      <PanelSection title="Opening">
+      <PanelSection title={t('nodes.dormer.window')}>
         <SliderControl
-          label="Width"
+          label={t('common.width')}
           max={Math.max(0.5, node.width - 0.1)}
           min={0.2}
           onChange={(v) => previewProp({ windowWidth: v })}
@@ -85,7 +86,7 @@ export function DormerWindowSection({
           value={Math.round(node.windowWidth * 100) / 100}
         />
         <SliderControl
-          label="Height"
+          label={t('common.height')}
           max={Math.max(0.2, node.wallSkirtHeight - 0.1)}
           min={0.2}
           onChange={(v) => previewProp({ windowHeight: v })}
@@ -122,7 +123,7 @@ export function DormerWindowSection({
         />
       </PanelSection>
 
-      <PanelSection title="Shape">
+      <PanelSection title={t('nodes.dormer.window')}>
         <SegmentedControl
           onChange={(v) =>
             handleUpdate({
@@ -140,9 +141,9 @@ export function DormerWindowSection({
             })
           }
           options={[
-            { value: 'rectangle', label: 'Rect' },
-            { value: 'rounded', label: 'Rounded' },
-            { value: 'arch', label: 'Arch' },
+            { value: 'rectangle', label: t('nodes.dormer.rect') },
+            { value: 'rounded', label: t('nodes.dormer.rounded') },
+            { value: 'arch', label: t('nodes.dormer.arch') },
           ]}
           value={windowShape}
         />
@@ -151,14 +152,14 @@ export function DormerWindowSection({
             <SegmentedControl
               onChange={(v) => setRadiusViewMode(v as WindowRadiusMode)}
               options={[
-                { value: 'all', label: 'All' },
-                { value: 'individual', label: 'Individual' },
+                { value: 'all', label: t('nodes.dormer.all') },
+                { value: 'individual', label: t('nodes.dormer.individual') },
               ]}
               value={tupleIsUniform ? radiusViewMode : 'individual'}
             />
             {tupleIsUniform && radiusViewMode === 'all' ? (
               <SliderControl
-                label="Corner Radius"
+                label={t('nodes.dormer.cornerRadius')}
                 max={maxRadius}
                 min={0}
                 onChange={(v) => setAllCornerRadii(v, false)}
@@ -172,10 +173,10 @@ export function DormerWindowSection({
             ) : (
               (
                 [
-                  ['Top Left', 0],
-                  ['Top Right', 1],
-                  ['Bottom Right', 2],
-                  ['Bottom Left', 3],
+                  [t('nodes.dormer.topLeft'), 0],
+                  [t('nodes.dormer.topRight'), 1],
+                  [t('nodes.dormer.bottomRight'), 2],
+                  [t('nodes.dormer.bottomLeft'), 3],
                 ] as const
               ).map(([label, index]) => (
                 <SliderControl
@@ -197,7 +198,7 @@ export function DormerWindowSection({
         )}
         {windowShape === 'arch' && (
           <SliderControl
-            label="Arch Height"
+            label={t('nodes.dormer.archHeight')}
             max={Math.max(0.1, node.windowHeight)}
             min={0.1}
             onChange={(v) => previewProp({ windowArchHeight: v })}
@@ -211,9 +212,9 @@ export function DormerWindowSection({
         )}
       </PanelSection>
 
-      <PanelSection title="Frame">
+      <PanelSection title={t('nodes.dormer.window')}>
         <SliderControl
-          label="Thickness"
+          label={t('common.thickness')}
           max={0.15}
           min={0.01}
           onChange={(v) => previewProp({ windowFrameThickness: v })}
@@ -225,7 +226,7 @@ export function DormerWindowSection({
           value={Math.round(node.windowFrameThickness * 1000) / 1000}
         />
         <SliderControl
-          label="Depth"
+          label={t('common.depth')}
           max={0.15}
           min={0.02}
           onChange={(v) => previewProp({ windowFrameDepth: v })}
@@ -237,7 +238,7 @@ export function DormerWindowSection({
           value={Math.round(node.windowFrameDepth * 1000) / 1000}
         />
         <SliderControl
-          label="Divider"
+          label={t('nodes.dormer.divider')}
           max={0.06}
           min={0}
           onChange={(v) => previewProp({ windowDividerThickness: v })}
@@ -250,9 +251,9 @@ export function DormerWindowSection({
         />
       </PanelSection>
 
-      <PanelSection title="Grid">
+      <PanelSection title={t('nodes.dormer.window')}>
         <SliderControl
-          label="Columns"
+          label={t('nodes.dormer.columns')}
           max={8}
           min={1}
           onChange={(v) => previewProp({ windowColumns: Math.max(1, Math.min(8, Math.round(v))) })}
@@ -263,7 +264,7 @@ export function DormerWindowSection({
           value={node.windowColumns}
         />
         <SliderControl
-          label="Rows"
+          label={t('nodes.dormer.rows')}
           max={8}
           min={1}
           onChange={(v) => previewProp({ windowRows: Math.max(1, Math.min(8, Math.round(v))) })}
@@ -275,16 +276,16 @@ export function DormerWindowSection({
         />
       </PanelSection>
 
-      <PanelSection title="Sill">
+      <PanelSection title={t('nodes.dormer.window')}>
         <ToggleControl
           checked={node.windowSill}
-          label="Enable Sill"
+          label={t('nodes.dormer.enableSill')}
           onChange={(checked) => handleUpdate({ windowSill: checked })}
         />
         {node.windowSill && (
           <div className="mt-1 flex flex-col gap-1">
             <SliderControl
-              label="Depth"
+              label={t('common.depth')}
               max={0.3}
               min={0.02}
               onChange={(v) => previewProp({ windowSillDepth: v })}
@@ -296,7 +297,7 @@ export function DormerWindowSection({
               value={Math.round(node.windowSillDepth * 1000) / 1000}
             />
             <SliderControl
-              label="Thickness"
+              label={t('common.thickness')}
               max={0.1}
               min={0.01}
               onChange={(v) => previewProp({ windowSillThickness: v })}

@@ -1,3 +1,5 @@
+'use client'
+
 import { Html } from '@react-three/drei'
 import type { ThreeElements } from '@react-three/fiber'
 import { forwardRef } from 'react'
@@ -5,6 +7,7 @@ import type { Group } from 'three'
 import { furnishTools } from '../../../components/ui/action-menu/furnish-tools'
 import { tools } from '../../../components/ui/action-menu/structure-tools'
 import { EDITOR_LAYER } from '../../../lib/constants'
+import { messages, useLocale } from '../../../lib/i18n'
 import useEditor from '../../../store/use-editor'
 
 interface CursorSphereProps extends Omit<ThreeElements['group'], 'ref'> {
@@ -20,6 +23,8 @@ export const CursorSphere = forwardRef<Group, CursorSphereProps>(function Cursor
   { color = '#818cf8', showTooltip = true, height = 2.5, visible = true, tooltipContent, ...props },
   ref,
 ) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const tool = useEditor((s) => s.tool)
   const mode = useEditor((s) => s.mode)
   const catalogCategory = useEditor((s) => s.catalogCategory)
@@ -102,7 +107,7 @@ export const CursorSphere = forwardRef<Group, CursorSphereProps>(function Cursor
           {tooltipContent || (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              alt={activeToolConfig!.label}
+              alt={t(activeToolConfig!.labelKey)}
               src={activeToolConfig!.iconSrc}
               style={{
                 width: '100%',

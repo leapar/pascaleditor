@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import type { LevelDuplicatePreset } from '../../lib/level-duplication'
 import { getLevelDisplayName } from '../../lib/level-name'
 import { cn } from '../../lib/utils'
+import { messages, useLocale } from '../../lib/i18n'
 import {
   Dialog,
   DialogContent,
@@ -16,34 +17,34 @@ import {
 
 const DUPLICATE_PRESETS: Array<{
   id: LevelDuplicatePreset
-  label: string
-  description: string
+  labelKey: string
+  descKey: string
 }> = [
   {
     id: 'everything',
-    label: 'Everything',
-    description: 'Structure, materials, furniture, and references.',
+    labelKey: 'levelDuplicate.everything',
+    descKey: 'levelDuplicate.everythingDesc',
   },
   {
     id: 'structure',
-    label: 'Structure only',
-    description: 'Walls, slabs, roofs, stairs, windows, and doors without finishes.',
+    labelKey: 'levelDuplicate.structure',
+    descKey: 'levelDuplicate.structureDesc',
   },
   {
     id: 'structure-materials',
-    label: 'Structure + materials',
-    description: 'Structure with the current material and finish assignments.',
+    labelKey: 'levelDuplicate.structureMaterials',
+    descKey: 'levelDuplicate.structureMaterialsDesc',
   },
   {
     id: 'structure-furniture',
-    label: 'Structure + furniture',
-    description: 'Structure, finishes, and placed items, without guide references.',
+    labelKey: 'levelDuplicate.structureFurniture',
+    descKey: 'levelDuplicate.structureFurnitureDesc',
   },
 ]
 
-function getLevelLabel(level: LevelNode | null) {
+function getLevelLabel(level: LevelNode | null, locale: string) {
   if (!level) return 'this level'
-  return getLevelDisplayName(level)
+  return getLevelDisplayName(level, locale as 'en' | 'zh')
 }
 
 export function LevelDuplicateDialog({
@@ -58,6 +59,14 @@ export function LevelDuplicateDialog({
   onOpenChange: (open: boolean) => void
 }) {
   const [preset, setPreset] = useState<LevelDuplicatePreset>('everything')
+  const { locale } = useLocale()
+  const t = (key: string, params?: Record<string, string | number>) => {
+    const str = (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
+    if (!params) return str
+    return Object.entries(params).reduce(
+      (s, [k, v]) => s.replace(new RegExp(`\\{${k}}`, 'g'), String(v)), str,
+    )
+  }
 
   useEffect(() => {
     if (open) {
@@ -69,8 +78,8 @@ export function LevelDuplicateDialog({
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="sm:max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Duplicate Level</DialogTitle>
-          <DialogDescription>Choose what to copy from {getLevelLabel(level)}.</DialogDescription>
+          <DialogTitle>{t('levelDuplicate.duplicateLevel')}</DialogTitle>
+          <DialogDescription>{t('levelDuplicate.chooseWhatToCopy', { level: getLevelLabel(level, locale) })}</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-2">
@@ -86,8 +95,8 @@ export function LevelDuplicateDialog({
               onClick={() => setPreset(option.id)}
               type="button"
             >
-              <div className="font-medium text-sm">{option.label}</div>
-              <div className="mt-1 text-muted-foreground text-xs">{option.description}</div>
+              <div className="font-medium text-sm">{t(option.labelKey)}</div>
+              <div className="mt-1 text-muted-foreground text-xs">{t(option.descKey)}</div>
             </button>
           ))}
         </div>
@@ -98,14 +107,14 @@ export function LevelDuplicateDialog({
             onClick={() => onOpenChange(false)}
             type="button"
           >
-            Cancel
+            {t('levelDuplicate.cancel')}
           </button>
           <button
             className="cursor-pointer rounded-md bg-primary px-4 py-2 text-primary-foreground text-sm transition-opacity hover:opacity-90"
             onClick={() => onConfirm(preset)}
             type="button"
           >
-            Duplicate
+            {t('levelDuplicate.duplicate')}
           </button>
         </DialogFooter>
       </DialogContent>

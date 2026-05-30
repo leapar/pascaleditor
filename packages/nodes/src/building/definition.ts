@@ -39,8 +39,8 @@ export const buildingDefinition: NodeDefinition<typeof BuildingNode> = {
   },
 
   presentation: {
-    label: 'Building',
-    description: 'A building container holding one or more levels.',
+    label: 'nodes.building.label',
+    description: 'nodes.building.description',
     icon: { kind: 'url', src: '/icons/building.png' },
     paletteSection: 'site',
     paletteOrder: 6,

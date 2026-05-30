@@ -217,3 +217,4 @@ export {
 } from './store/use-palette-view-registry'
 export { useUploadStore } from './store/use-upload'
 export { useWallMoveGhosts, type WallMoveGhostBridge } from './store/use-wall-move-ghosts'
+export { I18nProvider, useLocale, useTranslations, defaultLocale, type Locale, messages } from './lib/i18n'

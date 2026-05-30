@@ -1,9 +1,12 @@
+'use client'
+
 import { type AnyNodeId, type RoofNode, type RoofSegmentNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { AnimatePresence } from 'motion/react'
 import Image from 'next/image'
 import { memo, useCallback, useEffect, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
+import { messages, useLocale } from '../../../../../lib/i18n'
 import useEditor from '../../../../../store/use-editor'
 import { InlineRenameInput } from './inline-rename-input'
 import { focusTreeNode, handleTreeSelection, TreeNode, TreeNodeWrapper } from './tree-node'
@@ -23,6 +26,8 @@ export const RoofTreeNode = memo(function RoofTreeNode({
 }: RoofTreeNodeProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const isVisible = useScene((s) => s.nodes[nodeId]?.visible !== false)
   const isSelected = useViewer((state) => state.selection.selectedIds.includes(nodeId))
   const isHovered = useViewer((state) => state.hoveredId === nodeId)
@@ -83,7 +88,8 @@ export const RoofTreeNode = memo(function RoofTreeNode({
   }, [isDropTarget, expanded])
 
   const segmentCount = segments.length
-  const defaultName = `Roof (${segmentCount} segment${segmentCount !== 1 ? 's' : ''})`
+  const defaultName = 'nodeTypes.roofWithSegments'
+  const defaultNameParams = { count: segmentCount }
 
   // Hide the dragged segment from every roof while dragging
   const visibleSegments = drag ? segments.filter((seg) => seg.id !== drag.nodeId) : segments
@@ -108,6 +114,7 @@ export const RoofTreeNode = memo(function RoofTreeNode({
         label={
           <InlineRenameInput
             defaultName={defaultName}
+            defaultNameParams={defaultNameParams}
             isEditing={isEditing}
             nodeId={nodeId}
             onStartEditing={handleStartEditing}
@@ -164,6 +171,8 @@ function RoofSegmentTreeNode({
 }) {
   const [isEditing, setIsEditing] = useState(false)
   const [expanded, setExpanded] = useState(true)
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const accessoryIds = useScene(
     useShallow(
       (s) => (s.nodes[node.id] as RoofSegmentNode | undefined)?.children ?? ([] as string[]),
@@ -214,7 +223,13 @@ function RoofSegmentTreeNode({
   const handleStartEditing = useCallback(() => setIsEditing(true), [])
   const handleStopEditing = useCallback(() => setIsEditing(false), [])
 
-  const defaultName = `${node.roofType.charAt(0).toUpperCase() + node.roofType.slice(1)} (${node.width.toFixed(1)}x${node.depth.toFixed(1)}m)`
+  const defaultName = 'nodeTypes.roofSegmentWithDims'
+  const roofTypeKey = `nodeTypes.${node.roofType}` as keyof typeof messages.en
+  const defaultNameParams = {
+    type: (messages[locale] as Record<string, string>)[roofTypeKey] || node.roofType,
+    width: node.width.toFixed(1),
+    depth: node.depth.toFixed(1),
+  }
 
   const hasAccessories = accessoryIds.length > 0
 
@@ -242,6 +257,7 @@ function RoofSegmentTreeNode({
         label={
           <InlineRenameInput
             defaultName={defaultName}
+            defaultNameParams={defaultNameParams}
             isEditing={isEditing}
             nodeId={node.id}
             onStartEditing={handleStartEditing}

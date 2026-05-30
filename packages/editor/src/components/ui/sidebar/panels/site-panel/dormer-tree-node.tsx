@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, type DormerNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import Image from 'next/image'
@@ -48,7 +50,7 @@ export const DormerTreeNode = memo(function DormerTreeNode({
     [nodeId, setSelection],
   )
 
-  const defaultName = node?.name || 'Dormer'
+  const defaultName = node?.name || 'nodeTypes.dormer'
 
   return (
     <TreeNodeWrapper

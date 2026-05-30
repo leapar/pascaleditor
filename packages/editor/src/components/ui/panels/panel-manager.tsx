@@ -26,6 +26,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useIsMobile } from '../../../hooks/use-mobile'
 import { sfxEmitter } from '../../../lib/sfx-bus'
 import useEditor from '../../../store/use-editor'
+import { messages, useLocale } from '../../../lib/i18n'
 import { MobilePanelSheet } from './mobile-panel-sheet'
 import { MobileSelectionBar } from './mobile-selection-bar'
 import { getNodeDisplay } from './node-display'
@@ -100,6 +101,7 @@ function MobilePanelLayer({
   const setSelectedReferenceId = useEditor((s) => s.setSelectedReferenceId)
   const setMovingNode = useEditor((s) => s.setMovingNode)
   const deleteNode = useScene((s) => s.deleteNode)
+  const { locale } = useLocale()
   const [isSheetOpen, setIsSheetOpen] = useState(false)
 
   // Reset sheet open state when the selection changes / clears
@@ -144,6 +146,9 @@ function MobilePanelLayer({
   if (!(node || isReference)) return null
 
   const display = getNodeDisplay(node)
+  const resolvedTitle = display.labelKey.includes('.')
+    ? (messages[locale] as Record<string, string>)[display.labelKey] || display.labelKey
+    : display.labelKey
 
   return (
     <>
@@ -160,7 +165,7 @@ function MobilePanelLayer({
         icon={display.icon}
         onClose={() => setIsSheetOpen(false)}
         open={isSheetOpen}
-        title={display.label}
+        title={resolvedTitle}
       >
         {panel}
       </MobilePanelSheet>

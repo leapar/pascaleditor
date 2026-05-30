@@ -1,3 +1,5 @@
+'use client'
+
 import { useGLTF } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { KTX2Loader } from 'three/examples/jsm/Addons.js'

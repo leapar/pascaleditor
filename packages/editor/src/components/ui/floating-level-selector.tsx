@@ -41,6 +41,7 @@ import {
   buildLevelDuplicateCreateOps,
   type LevelDuplicatePreset,
 } from '../../lib/level-duplication'
+import { useLocale, messages } from '../../lib/i18n'
 import { getDefaultLevelName, getLevelDisplayName } from '../../lib/level-name'
 import { deleteLevelWithFallbackSelection } from '../../lib/level-selection'
 import {
@@ -72,8 +73,9 @@ function LevelInlineRename({
   isEditing: boolean
   onStopEditing: () => void
 }) {
+  const { locale } = useLocale()
   const updateNode = useScene((s) => s.updateNode)
-  const defaultName = getDefaultLevelName(level.level)
+  const defaultName = getDefaultLevelName(level.level, locale)
   const [value, setValue] = useState(level.name || '')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -143,6 +145,8 @@ function LevelRow({
   onPaste?: () => void
   onRequestDelete: () => void
 }) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const [duplicateDialogOpen, setDuplicateDialogOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -176,7 +180,7 @@ function LevelRow({
               dragHandleProps?.onClick?.(e)
             }}
             ref={dragHandleRef}
-            title="Drag to reorder"
+            title={t('level.dragToReorder')}
             type="button"
           >
             <GripVertical className="h-3.5 w-3.5" />
@@ -189,7 +193,7 @@ function LevelRow({
               e.stopPropagation()
               setIsEditing(true)
             }}
-            title={getLevelDisplayName(level)}
+            title={getLevelDisplayName(level, locale)}
             type="button"
           >
             <span className="truncate">{getLevelDisplayName(level)}</span>
@@ -227,7 +231,7 @@ function LevelRow({
                 type="button"
               >
                 <Copy className="h-3 w-3" />
-                Duplicate with options...
+                {t('level.duplicateOptions')}
               </button>
               {onPaste && (
                 <button
@@ -251,7 +255,7 @@ function LevelRow({
                 type="button"
               >
                 <Trash2 className="h-3 w-3" />
-                Delete level
+                {t('level.deleteLevelTitle')}
               </button>
             </PopoverContent>
           </Popover>
@@ -323,6 +327,14 @@ function SortableLevelRow({
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function FloatingLevelSelector() {
+  const { locale } = useLocale()
+  const t = (key: string, params?: Record<string, string | number>) => {
+    const str = (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
+    if (!params) return str
+    return Object.entries(params).reduce(
+      (s, [k, v]) => s.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v)), str,
+    )
+  }
   const selectedBuildingId = useViewer((s) => s.selection.buildingId)
   const levelId = useViewer((s) => s.selection.levelId)
   const setSelection = useViewer((s) => s.setSelection)
@@ -517,7 +529,7 @@ export function FloatingLevelSelector() {
             <button
               className={cn(addButtonClass, 'top-0 -translate-y-1/2')}
               onClick={handleAddAbove}
-              title="Add level above"
+              title={t('level.addLevelAbove')}
               type="button"
             >
               <Plus className="h-2.5 w-2.5" />
@@ -529,7 +541,7 @@ export function FloatingLevelSelector() {
             <button
               className={cn(addButtonClass, 'bottom-0 translate-y-1/2')}
               onClick={handleAddBelow}
-              title="Add level below"
+              title={t('level.addLevelBelow')}
               type="button"
             >
               <Plus className="h-2.5 w-2.5" />
@@ -574,7 +586,7 @@ export function FloatingLevelSelector() {
                         <button
                           className={cn(addButtonClass, 'bottom-0 translate-y-1/2')}
                           onClick={() => handleInsertBetween(sortedIndex - 1)}
-                          title="Insert level here"
+                          title={t('level.insertLevelHere')}
                           type="button"
                         >
                           <Plus className="h-2.5 w-2.5" />
@@ -593,11 +605,9 @@ export function FloatingLevelSelector() {
       <Dialog onOpenChange={(open) => !open && setDeletingLevel(null)} open={!!deletingLevel}>
         <DialogContent showCloseButton={false}>
           <DialogHeader>
-            <DialogTitle>Delete level</DialogTitle>
+            <DialogTitle>{t('level.deleteLevelTitle')}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete{' '}
-              <strong>{deletingLevel ? getLevelDisplayName(deletingLevel) : ''}</strong>? All
-              walls, floors, and objects on this level will be permanently removed.
+              {t('level.confirmDelete', { name: deletingLevel ? getLevelDisplayName(deletingLevel) : '' })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -606,14 +616,14 @@ export function FloatingLevelSelector() {
               onClick={() => setDeletingLevel(null)}
               type="button"
             >
-              Cancel
+              {t('level.cancel')}
             </button>
             <button
               className="rounded-full bg-red-600 px-4 py-2 text-sm text-white transition-colors hover:bg-red-700"
               onClick={handleConfirmDelete}
               type="button"
             >
-              Delete
+              {t('level.delete')}
             </button>
           </DialogFooter>
         </DialogContent>

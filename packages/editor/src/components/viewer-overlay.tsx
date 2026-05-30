@@ -30,6 +30,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useShallow } from 'zustand/react/shallow'
+import { messages, useLocale } from '../lib/i18n'
 import { getLevelDisplayName } from '../lib/level-name'
 import { cn } from '../lib/utils'
 import { ActionButton } from './ui/action-menu/action-button'
@@ -48,47 +49,48 @@ type ProjectOwner = {
   image: string | null
 }
 
-const levelModeLabels: Record<'stacked' | 'exploded' | 'solo', string> = {
-  stacked: 'Stacked',
-  exploded: 'Exploded',
-  solo: 'Solo',
-}
+const levelModeLabels = (t: (key: string) => string) => ({
+  stacked: t('viewer.stack'),
+  exploded: t('viewer.exploded'),
+  solo: t('viewer.solo'),
+})
 
-const levelModeBadgeLabels: Record<'manual' | 'stacked' | 'exploded' | 'solo', string> = {
-  manual: 'Stack',
-  stacked: 'Stack',
-  exploded: 'Exploded',
-  solo: 'Solo',
-}
+const levelModeBadgeLabels = (t: (key: string) => string) => ({
+  manual: t('viewer.stack'),
+  stacked: t('viewer.stack'),
+  exploded: t('viewer.exploded'),
+  solo: t('viewer.solo'),
+})
 
-const wallModeConfig = {
+const wallModeConfig = (t: (key: string) => string) => ({
   up: {
     icon: (props: any) => (
-      <img alt="Full Height" height={28} src="/icons/room.png" width={28} {...props} />
+      <img alt={t('viewer.fullHeight')} height={28} src="/icons/room.png" width={28} {...props} />
     ),
-    label: 'Full Height',
+    label: t('viewer.fullHeight'),
   },
   cutaway: {
     icon: (props: any) => (
-      <img alt="Cutaway" height={28} src="/icons/wallcut.png" width={28} {...props} />
+      <img alt={t('viewer.cutaway')} height={28} src="/icons/wallcut.png" width={28} {...props} />
     ),
-    label: 'Cutaway',
+    label: t('viewer.cutaway'),
   },
   down: {
     icon: (props: any) => (
-      <img alt="Low" height={28} src="/icons/walllow.png" width={28} {...props} />
+      <img alt={t('viewer.low')} height={28} src="/icons/walllow.png" width={28} {...props} />
     ),
-    label: 'Low',
+    label: t('viewer.low'),
   },
-}
+})
 
-const SHADING_OPTIONS = [
-  { id: 'solid', name: 'Solid', detail: 'Flat and fast — no ambient occlusion', icon: Box },
-  { id: 'rendered', name: 'Rendered', detail: 'Full ambient occlusion', icon: Sparkles },
+const getShadingOptions = (t: (key: string) => string) => [
+  { id: 'solid', name: t('viewer.solid'), detail: t('viewer.flatAndFast'), icon: Box },
+  { id: 'rendered', name: t('viewer.rendered'), detail: t('viewer.fullAO'), icon: Sparkles },
 ] as const
 
-function RenderModeMenu() {
+function RenderModeMenu({ t }: { t: (key: string) => string }) {
   const shading = useViewer((s) => s.shading)
+  const SHADING_OPTIONS = getShadingOptions(t)
   const active = SHADING_OPTIONS.find((o) => o.id === shading) ?? SHADING_OPTIONS[0]
   const ActiveIcon = active.icon
   return (
@@ -96,7 +98,7 @@ function RenderModeMenu() {
       <DropdownMenuTrigger asChild>
         <ActionButton
           className="text-muted-foreground/80 hover:bg-white/5 hover:text-foreground"
-          label={`Render: ${active.name}`}
+          label={`${t('viewer.render')}: ${active.name}`}
           size="icon"
           tooltipSide="top"
           variant="ghost"
@@ -126,7 +128,7 @@ function RenderModeMenu() {
   )
 }
 
-function SceneThemeMenu() {
+function SceneThemeMenu({ t }: { t: (key: string) => string }) {
   const sceneTheme = useViewer((s) => s.sceneTheme)
   const active = getSceneTheme(sceneTheme)
   return (
@@ -134,7 +136,7 @@ function SceneThemeMenu() {
       <DropdownMenuTrigger asChild>
         <ActionButton
           className="text-muted-foreground/80 hover:bg-white/5 hover:text-foreground"
-          label={`Theme: ${active.name}`}
+          label={`${t('viewer.sceneTheme')}: ${active.name}`}
           size="icon"
           tooltipSide="top"
           variant="ghost"
@@ -175,14 +177,15 @@ function SceneThemeMenu() {
   )
 }
 
-const EDGE_OPTIONS = [
-  { id: 'off', name: 'Off', detail: 'No edge lines' },
-  { id: 'soft', name: 'Soft', detail: 'Faint outline of major creases' },
-  { id: 'strong', name: 'Strong', detail: 'Crisp, opaque edge lines' },
+const getEdgeOptions = (t: (key: string) => string) => [
+  { id: 'off', name: t('viewer.off_edge'), detail: t('viewer.noEdgeLines') },
+  { id: 'soft', name: t('viewer.soft'), detail: t('viewer.faintOutline') },
+  { id: 'strong', name: t('viewer.strong'), detail: t('viewer.crispEdges') },
 ] as const satisfies readonly { id: EdgeMode; name: string; detail: string }[]
 
-function EdgesMenu() {
+function EdgesMenu({ t }: { t: (key: string) => string }) {
   const edges = useViewer((s) => s.edges)
+  const EDGE_OPTIONS = getEdgeOptions(t)
   const active = EDGE_OPTIONS.find((o) => o.id === edges) ?? EDGE_OPTIONS[0]
   return (
     <DropdownMenu>
@@ -219,15 +222,15 @@ function EdgesMenu() {
   )
 }
 
-const getNodeName = (node: AnyNode): string => {
+const getNodeName = (node: AnyNode, t: (key: string) => string): string => {
   if ('name' in node && node.name) return node.name
-  if (node.type === 'wall') return 'Wall'
-  if (node.type === 'fence') return 'Fence'
-  if (node.type === 'item') return (node as { asset: { name: string } }).asset?.name || 'Item'
-  if (node.type === 'slab') return 'Slab'
-  if (node.type === 'ceiling') return 'Ceiling'
-  if (node.type === 'roof') return 'Roof'
-  if (node.type === 'roof-segment') return 'Roof Segment'
+  if (node.type === 'wall') return t('nodeTypes.wall')
+  if (node.type === 'fence') return t('nodeTypes.fence')
+  if (node.type === 'item') return (node as { asset: { name: string } }).asset?.name || t('nodeTypes.item')
+  if (node.type === 'slab') return t('nodeTypes.slab')
+  if (node.type === 'ceiling') return t('nodeTypes.ceiling')
+  if (node.type === 'roof') return t('nodeTypes.roof')
+  if (node.type === 'roof-segment') return t('nodeTypes.roofSegment')
   return node.type
 }
 
@@ -246,6 +249,9 @@ export const ViewerOverlay = ({
   canShowGuides = true,
   onBack,
 }: ViewerOverlayProps) => {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
+
   const selection = useViewer((s) => s.selection)
   const showScans = useViewer((s) => s.showScans)
   const showGuides = useViewer((s) => s.showGuides)
@@ -321,7 +327,7 @@ export const ViewerOverlay = ({
             )}
             <div className="min-w-0">
               <div className="truncate font-medium text-foreground text-sm">
-                {projectName || 'Untitled'}
+                {projectName || t('common.untitled')}
               </div>
               {owner?.username && (
                 <Link
@@ -352,7 +358,7 @@ export const ViewerOverlay = ({
                       className={`truncate transition-colors ${level ? 'text-muted-foreground hover:text-foreground' : 'font-medium text-foreground'}`}
                       onClick={() => handleBreadcrumbClick('building')}
                     >
-                      {building.name || 'Building'}
+                      {building.name || t('viewer.building')}
                     </button>
                   </>
                 )}
@@ -364,7 +370,7 @@ export const ViewerOverlay = ({
                       className={`truncate transition-colors ${zone ? 'text-muted-foreground hover:text-foreground' : 'font-medium text-foreground'}`}
                       onClick={() => handleBreadcrumbClick('level')}
                     >
-                      {getLevelDisplayName(level)}
+                      {getLevelDisplayName(level, locale)}
                     </button>
                   </>
                 )}
@@ -384,7 +390,7 @@ export const ViewerOverlay = ({
                   <>
                     <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
                     <span className="truncate font-medium text-foreground">
-                      {getNodeName(selectedNode)}
+                      {getNodeName(selectedNode, t)}
                     </span>
                   </>
                 )}
@@ -397,7 +403,7 @@ export const ViewerOverlay = ({
         {building && levels.length > 0 && (
           <div className="pointer-events-auto flex w-48 flex-col overflow-hidden rounded-2xl border border-border/40 bg-background/95 py-1 shadow-lg backdrop-blur-xl transition-colors duration-200 ease-out">
             <span className="px-3 py-2 font-medium text-[10px] text-muted-foreground uppercase tracking-wider">
-              Levels
+              {t('viewer.levels')}
             </span>
             <div className="flex flex-col">
               {levels.map((lvl) => {
@@ -446,14 +452,14 @@ export const ViewerOverlay = ({
                     ? 'bg-white/10'
                     : 'opacity-60 grayscale hover:bg-white/5 hover:opacity-100 hover:grayscale-0'
                 }
-                label={`Scans: ${showScans ? 'Visible' : 'Hidden'}`}
+                label={`Scans: ${showScans ? t('viewer.visible') : t('viewer.hidden')}`}
                 onClick={() => useViewer.getState().setShowScans(!showScans)}
                 size="icon"
                 tooltipSide="top"
                 variant="ghost"
               >
                 <img
-                  alt="Scans"
+                  alt={t('viewer.scans')}
                   className="h-[28px] w-[28px] object-contain"
                   src="/icons/mesh.png"
                 />
@@ -467,14 +473,14 @@ export const ViewerOverlay = ({
                     ? 'bg-white/10'
                     : 'opacity-60 grayscale hover:bg-white/5 hover:opacity-100 hover:grayscale-0'
                 }
-                label={`Guides: ${showGuides ? 'Visible' : 'Hidden'}`}
+                label={`Guides: ${showGuides ? t('viewer.visible') : t('viewer.hidden')}`}
                 onClick={() => useViewer.getState().setShowGuides(!showGuides)}
                 size="icon"
                 tooltipSide="top"
                 variant="ghost"
               >
                 <img
-                  alt="Guides"
+                  alt={t('viewer.guides')}
                   className="h-[28px] w-[28px] object-contain"
                   src="/icons/floorplan.png"
                 />
@@ -490,7 +496,7 @@ export const ViewerOverlay = ({
                   ? 'bg-violet-500/20 text-violet-400'
                   : 'hover:bg-white/5 hover:text-violet-400'
               }
-              label={`Camera: ${cameraMode === 'perspective' ? 'Perspective' : 'Orthographic'}`}
+              label={`Camera: ${cameraMode === 'perspective' ? t('viewer.perspective') : t('viewer.orthographic')}`}
               onClick={() =>
                 useViewer
                   .getState()
@@ -503,11 +509,11 @@ export const ViewerOverlay = ({
               <Camera className="h-6 w-6" />
             </ActionButton>
 
-            <RenderModeMenu />
+            <RenderModeMenu t={t} />
 
-            <SceneThemeMenu />
+            <SceneThemeMenu t={t} />
 
-            <EdgesMenu />
+            <EdgesMenu t={t} />
 
             {/* Level Mode */}
             <ActionButton
@@ -517,7 +523,7 @@ export const ViewerOverlay = ({
                   ? 'text-muted-foreground/80 hover:bg-white/5 hover:text-foreground'
                   : 'bg-white/10 text-foreground',
               )}
-              label={`Levels: ${levelMode === 'manual' ? 'Manual' : levelModeLabels[levelMode as keyof typeof levelModeLabels]}`}
+              label={`Levels: ${levelMode === 'manual' ? t('viewer.manual') : levelModeLabels(t)[levelMode as keyof ReturnType<typeof levelModeLabels>]}`}
               onClick={() => {
                 if (levelMode === 'manual') return useViewer.getState().setLevelMode('stacked')
                 const modes: ('stacked' | 'exploded' | 'solo')[] = ['stacked', 'exploded', 'solo']
@@ -540,7 +546,7 @@ export const ViewerOverlay = ({
                   aria-hidden="true"
                   className="pointer-events-none absolute right-1 bottom-1 left-1 rounded border border-border/50 bg-background/70 px-0.5 py-[2px] text-center font-medium font-pixel text-[8px] text-foreground/85 leading-none tracking-[-0.02em] backdrop-blur-sm"
                 >
-                  {levelModeBadgeLabels[levelMode]}
+                  {levelModeBadgeLabels(t)[levelMode as keyof ReturnType<typeof levelModeBadgeLabels>]}
                 </span>
               </span>
             </ActionButton>
@@ -552,7 +558,7 @@ export const ViewerOverlay = ({
                   ? 'bg-white/10'
                   : 'opacity-60 grayscale hover:bg-white/5 hover:opacity-100 hover:grayscale-0'
               }
-              label={`Walls: ${wallModeConfig[wallMode as keyof typeof wallModeConfig].label}`}
+              label={`Walls: ${wallModeConfig(t)[wallMode as keyof ReturnType<typeof wallModeConfig>].label}`}
               onClick={() => {
                 const modes: ('cutaway' | 'up' | 'down')[] = ['cutaway', 'up', 'down']
                 const nextIndex = (modes.indexOf(wallMode as any) + 1) % modes.length
@@ -563,7 +569,7 @@ export const ViewerOverlay = ({
               variant="ghost"
             >
               {(() => {
-                const Icon = wallModeConfig[wallMode as keyof typeof wallModeConfig].icon
+                const Icon = wallModeConfig(t)[wallMode as keyof ReturnType<typeof wallModeConfig>].icon
                 return <Icon className="h-[28px] w-[28px]" />
               })()}
             </ActionButton>
@@ -573,14 +579,14 @@ export const ViewerOverlay = ({
             {/* Camera Actions */}
             <ActionButton
               className="group hidden hover:bg-white/5 sm:inline-flex"
-              label="Orbit Left"
+              label={t('viewer.orbitLeft')}
               onClick={() => emitter.emit('camera-controls:orbit-ccw')}
               size="icon"
               tooltipSide="top"
               variant="ghost"
             >
               <img
-                alt="Orbit Left"
+                alt={t('viewer.orbitLeft')}
                 className="h-[28px] w-[28px] -scale-x-100 object-contain opacity-70 transition-opacity group-hover:opacity-100"
                 src="/icons/rotate.png"
               />
@@ -588,14 +594,14 @@ export const ViewerOverlay = ({
 
             <ActionButton
               className="group hidden hover:bg-white/5 sm:inline-flex"
-              label="Orbit Right"
+              label={t('viewer.orbitRight')}
               onClick={() => emitter.emit('camera-controls:orbit-cw')}
               size="icon"
               tooltipSide="top"
               variant="ghost"
             >
               <img
-                alt="Orbit Right"
+                alt={t('viewer.orbitRight')}
                 className="h-[28px] w-[28px] object-contain opacity-70 transition-opacity group-hover:opacity-100"
                 src="/icons/rotate.png"
               />
@@ -603,14 +609,14 @@ export const ViewerOverlay = ({
 
             <ActionButton
               className="group hover:bg-white/5"
-              label="Top View"
+              label={t('viewer.topView')}
               onClick={() => emitter.emit('camera-controls:top-view')}
               size="icon"
               tooltipSide="top"
               variant="ghost"
             >
               <img
-                alt="Top View"
+                alt={t('viewer.topView')}
                 className="h-[28px] w-[28px] object-contain opacity-70 transition-opacity group-hover:opacity-100"
                 src="/icons/topview.png"
               />

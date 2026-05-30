@@ -135,16 +135,16 @@ export const itemDefinition: NodeDefinition<typeof ItemNode> = {
   floorplanMoveTarget: itemFloorplanMoveTarget,
 
   toolHints: [
-    { key: 'Left click', label: 'Place item' },
-    { key: 'R', label: 'Rotate counterclockwise' },
-    { key: 'T', label: 'Rotate clockwise' },
-    { key: 'Shift', label: 'Free place' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'itemHelper.placeItem' },
+    { key: 'R', label: 'itemHelper.rotateCounterclockwise' },
+    { key: 'T', label: 'itemHelper.rotateClockwise' },
+    { key: 'Shift', label: 'itemHelper.freePlace' },
+    { key: 'Esc', label: 'common.cancel' },
   ],
 
   presentation: {
-    label: 'Item',
-    description: 'A catalog-backed item (furniture, fixtures, decorations).',
+    label: 'nodes.item.label',
+    description: 'nodes.item.description',
     icon: { kind: 'url', src: '/icons/item.png' },
     paletteSection: 'furnish',
     paletteOrder: 10,

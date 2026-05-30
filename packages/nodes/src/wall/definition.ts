@@ -107,14 +107,14 @@ export const wallDefinition: NodeDefinition<typeof WallNode> = {
   floorplanSiblingOverrides: wallFloorplanSiblingOverrides,
 
   toolHints: [
-    { key: 'Left click', label: 'Set wall start / end' },
-    { key: 'Shift', label: 'Allow non-45° angles' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.wall.toolHints.setStartEnd' },
+    { key: 'Shift', label: 'nodes.wall.toolHints.allowAngles' },
+    { key: 'Esc', label: 'nodes.wall.toolHints.cancel' },
   ],
 
   presentation: {
-    label: 'Wall',
-    description: 'A straight or curved wall segment. Hosts doors, windows, and wall-mounted items.',
+    label: 'nodes.wall.label',
+    description: 'nodes.wall.description',
     icon: { kind: 'url', src: '/icons/wall.png' },
     paletteSection: 'structure',
     paletteOrder: 10,

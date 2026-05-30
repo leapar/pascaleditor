@@ -81,12 +81,12 @@ export const chimneyDefinition: NodeDefinition<typeof ChimneyNode> = {
 
   tool: () => import('./tool'),
   toolHints: [
-    { key: 'Left click', label: 'Place chimney on roof' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.chimney.toolHints.place' },
+    { key: 'Esc', label: 'common.cancel' },
   ],
 
   presentation: {
-    label: 'Chimney',
+    label: 'nodes.chimney.label',
     description: 'Vertical masonry stack on a roof segment.',
     icon: { kind: 'url', src: '/icons/roof.png' },
     paletteSection: 'structure',

@@ -1,3 +1,5 @@
+'use client'
+
 import type { ComponentType } from 'react'
 import type { BufferGeometry, Object3D } from 'three'
 import type { ZodObject, z } from 'zod'

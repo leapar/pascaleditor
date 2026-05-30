@@ -9,6 +9,7 @@
 // `loaded` guard inside `../lib/bootstrap` keeps the side effect
 // idempotent under HMR.
 import '../lib/bootstrap'
+import { I18nProvider } from '@pascal-app/editor'
 import { type ReactNode, useEffect } from 'react'
 
 export function ClientBootstrap({ children }: { children: ReactNode }) {
@@ -19,5 +20,5 @@ export function ClientBootstrap({ children }: { children: ReactNode }) {
     // is already a direct dep, so we don't need the CDN auto-global.
     import('react-scan').then(({ scan }) => scan({ enabled: true }))
   }, [])
-  return children
+  return <I18nProvider>{children}</I18nProvider>
 }

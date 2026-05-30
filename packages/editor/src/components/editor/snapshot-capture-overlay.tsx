@@ -4,6 +4,7 @@ import { emitter } from '@pascal-app/core'
 import { Camera, Check, Crop, Loader2, Maximize2, Monitor, X } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useIsMobile } from '../../hooks/use-mobile'
+import { messages, useLocale } from '../../lib/i18n'
 import { triggerSFX } from '../../lib/sfx-bus'
 import useEditor from '../../store/use-editor'
 
@@ -50,6 +51,8 @@ function getResolution(
 }
 
 export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const isCaptureMode = useEditor((s) => s.isCaptureMode)
   const captureMode = useEditor((s) => s.captureMode)
   const setCaptureMode = useEditor((s) => s.setCaptureMode)
@@ -393,13 +396,13 @@ export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
       {/* Top-right dismiss button (icon-only on mobile) */}
       <div className="pointer-events-auto absolute top-4 right-4">
         <button
-          aria-label="Close capture mode"
+          aria-label={t('snapshot.closeCapture')}
           className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-3 py-1.5 text-white/80 text-xs backdrop-blur-sm transition-colors hover:bg-black/80 hover:text-white"
           onClick={dismiss}
           type="button"
         >
           <X className="h-3 w-3" />
-          {!isMobile && 'Esc to cancel'}
+          {!isMobile && t('snapshot.escToCancel')}
         </button>
       </div>
 
@@ -415,7 +418,7 @@ export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
                 active={mode === 'standard'}
                 badge="16:9"
                 icon={<Monitor className="h-3.5 w-3.5" />}
-                label="Standard"
+                label={t('snapshot.standard')}
                 onClick={() => {
                   setMode('standard')
                   setDrag(null)
@@ -424,7 +427,7 @@ export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
               <ModeButton
                 active={mode === 'viewport'}
                 icon={<Maximize2 className="h-3.5 w-3.5" />}
-                label="Viewport"
+                label={t('snapshot.viewport')}
                 onClick={() => {
                   setMode('viewport')
                   setDrag(null)
@@ -433,7 +436,7 @@ export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
               <ModeButton
                 active={mode === 'area'}
                 icon={<Crop className="h-3.5 w-3.5" />}
-                label="Area"
+                label={t('snapshot.area')}
                 onClick={() => setMode('area')}
               />
             </>
@@ -455,17 +458,17 @@ export function SnapshotCaptureOverlay({ projectId }: { projectId: string }) {
               {captureState === 'capturing' ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  Capturing
+                  {t('snapshot.capturing')}
                 </>
               ) : captureState === 'saved' ? (
                 <>
                   <Check className="h-3.5 w-3.5" />
-                  Saved
+                  {t('snapshot.saved')}
                 </>
               ) : (
                 <>
                   <Camera className="h-3.5 w-3.5" />
-                  Capture
+                  {t('snapshot.capture')}
                 </>
               )}
             </button>

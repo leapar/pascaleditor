@@ -16,6 +16,7 @@ import {
   SliderControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useCallback, useState } from 'react'
@@ -42,6 +43,7 @@ const SECTION_OPTIONS: Array<{ label: string; value: DormerSection }> = [
 ]
 
 export default function DormerPanel() {
+  const t = useTranslations()
   const [section, setSection] = useState<DormerSection>('dormer')
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
@@ -162,7 +164,7 @@ export default function DormerPanel() {
       icon="/icons/roof.png"
       onBack={node.roofSegmentId ? handleBack : undefined}
       onClose={handleClose}
-      title={node.name || 'Dormer'}
+      title={node.name || t('nodes.dormer.fallbackTitle')}
       width={300}
     >
       <DormerPositionSection
@@ -174,7 +176,7 @@ export default function DormerPanel() {
         selectedId={selectedId}
       />
 
-      <PanelSection title="Section">
+      <PanelSection title={t('nodes.dormer.section')}>
         <div className="grid grid-cols-3 gap-1.5 px-1 pt-1">
           {SECTION_OPTIONS.map((option) => {
             const isSelected = section === option.value
@@ -199,9 +201,9 @@ export default function DormerPanel() {
 
       {section === 'dormer' && (
         <>
-          <PanelSection title="Dimensions">
+          <PanelSection title={t('common.dimensions')}>
             <SliderControl
-              label="Width"
+              label={t('common.width')}
               max={4}
               min={0.5}
               onChange={(v) => previewProp({ width: v })}
@@ -213,7 +215,7 @@ export default function DormerPanel() {
               value={Math.round(node.width * 100) / 100}
             />
             <SliderControl
-              label="Depth"
+              label={t('common.depth')}
               max={5}
               min={0.5}
               onChange={(v) => previewProp({ depth: v })}
@@ -225,7 +227,7 @@ export default function DormerPanel() {
               value={Math.round(node.depth * 100) / 100}
             />
             <SliderControl
-              label="Wall Height"
+              label={t('nodes.dormer.wallHeight')}
               max={5}
               min={0}
               onChange={(v) => previewProp({ height: v })}
@@ -237,7 +239,7 @@ export default function DormerPanel() {
               value={Math.round(node.height * 100) / 100}
             />
             <SliderControl
-              label="Roof Height"
+              label={t('nodes.dormer.roofHeight')}
               max={3}
               min={0}
               onChange={(v) => previewProp({ roofHeight: v })}
@@ -250,7 +252,7 @@ export default function DormerPanel() {
             />
           </PanelSection>
 
-          <PanelSection title="Roof Type">
+          <PanelSection title={t('nodes.dormer.section')}>
             <div className="grid grid-cols-3 gap-1.5 px-1 pt-1">
               {ROOF_TYPE_OPTIONS.map((option) => {
                 const isSelected = node.roofType === option.value

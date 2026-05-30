@@ -1,7 +1,7 @@
 'use client'
 
 import { emitter, type GridEvent, type LevelNode, useScene } from '@pascal-app/core'
-import { CursorSphere, EDITOR_LAYER, markToolCancelConsumed, triggerSFX } from '@pascal-app/editor'
+import { CursorSphere, EDITOR_LAYER, markToolCancelConsumed, triggerSFX, useTranslations } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BufferGeometry, DoubleSide, type Group, type Line, Shape, Vector3 } from 'three'
@@ -42,10 +42,8 @@ function calculateSnapPoint(
   return [x1, y]
 }
 
-function commitCeilingDrawing(levelId: LevelNode['id'], points: Array<[number, number]>): string {
-  const { createNode, nodes } = useScene.getState()
-  const ceilingCount = Object.values(nodes).filter((n) => n.type === 'ceiling').length
-  const name = `Ceiling ${ceilingCount + 1}`
+function commitCeilingDrawing(levelId: LevelNode['id'], points: Array<[number, number]>, name: string): string {
+  const { createNode } = useScene.getState()
   const ceiling = CeilingNode.parse({ name, polygon: points })
   createNode(ceiling, levelId)
   triggerSFX('sfx:structure-build')
@@ -53,6 +51,7 @@ function commitCeilingDrawing(levelId: LevelNode['id'], points: Array<[number, n
 }
 
 export const CeilingTool: React.FC = () => {
+  const t = useTranslations()
   const cursorRef = useRef<Group>(null)
   const gridCursorRef = useRef<Group>(null)
   const mainLineRef = useRef<Line>(null!)
@@ -128,7 +127,10 @@ export const CeilingTool: React.FC = () => {
         Math.abs(clickPoint[0] - firstPoint[0]) < 0.25 &&
         Math.abs(clickPoint[1] - firstPoint[1]) < 0.25
       ) {
-        const ceilingId = commitCeilingDrawing(currentLevelId, points)
+        const { nodes } = useScene.getState()
+        const ceilingCount = Object.values(nodes).filter((n) => n.type === 'ceiling').length
+        const ceilingName = t('nodes.ceiling.defaultName', { count: ceilingCount + 1 })
+        const ceilingId = commitCeilingDrawing(currentLevelId, points, ceilingName)
         setSelection({ selectedIds: [ceilingId] })
         setPoints([])
       } else {
@@ -139,7 +141,10 @@ export const CeilingTool: React.FC = () => {
     const onGridDoubleClick = (_event: GridEvent) => {
       if (!currentLevelId) return
       if (points.length >= 3) {
-        const ceilingId = commitCeilingDrawing(currentLevelId, points)
+        const { nodes } = useScene.getState()
+        const ceilingCount = Object.values(nodes).filter((n) => n.type === 'ceiling').length
+        const ceilingName = t('nodes.ceiling.defaultName', { count: ceilingCount + 1 })
+        const ceilingId = commitCeilingDrawing(currentLevelId, points, ceilingName)
         setSelection({ selectedIds: [ceilingId] })
         setPoints([])
       }

@@ -1,3 +1,5 @@
+'use client'
+
 import { type LevelNode, useScene } from '@pascal-app/core'
 import { useMemo } from 'react'
 import * as THREE from 'three'

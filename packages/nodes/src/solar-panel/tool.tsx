@@ -9,7 +9,7 @@ import {
   sceneRegistry,
   useScene,
 } from '@pascal-app/core'
-import { triggerSFX } from '@pascal-app/editor'
+import { triggerSFX, useTranslations } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
@@ -29,6 +29,7 @@ const worldPoint = new THREE.Vector3()
  * in the node so the renderer reproduces the same orientation.
  */
 const SolarPanelTool = () => {
+  const t = useTranslations()
   const activeBuildingId = useViewer((s) => s.selection.buildingId)
   const setSelection = useViewer((s) => s.setSelection)
 
@@ -96,6 +97,7 @@ const SolarPanelTool = () => {
       )
       if (!hit) return
       const state = useScene.getState()
+      const panelCount = Object.values(state.nodes).filter((n) => (n as any).type === 'solarPanel').length
 
       // Use the raycast hit Y (segment-local) and analytical normal so the
       // committed panel sits exactly where the ghost was rendered. The
@@ -106,7 +108,7 @@ const SolarPanelTool = () => {
 
       const panel = SolarPanelNode.parse({
         ...solarPanelDefinition.defaults(),
-        name: 'Solar Panel',
+        name: t('nodes.solarPanel.defaultName', { count: panelCount + 1 }),
         roofSegmentId: hit.segment.id,
         position: [hit.localX, hit.localY, hit.localZ],
         rotation: 0,

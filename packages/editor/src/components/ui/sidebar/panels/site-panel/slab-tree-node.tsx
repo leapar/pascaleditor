@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, type SlabNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import Image from 'next/image'
@@ -46,7 +48,8 @@ export const SlabTreeNode = memo(function SlabTreeNode({
   const handleStopEditing = useCallback(() => setIsEditing(false), [])
 
   const area = calculatePolygonArea(polygon).toFixed(1)
-  const defaultName = `Slab (${area}m²)`
+  const defaultName = 'nodeTypes.slabWithArea'
+  const defaultNameParams = { area }
 
   return (
     <TreeNodeWrapper
@@ -64,6 +67,7 @@ export const SlabTreeNode = memo(function SlabTreeNode({
       label={
         <InlineRenameInput
           defaultName={defaultName}
+          defaultNameParams={defaultNameParams}
           isEditing={isEditing}
           nodeId={nodeId}
           onStartEditing={handleStartEditing}

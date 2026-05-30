@@ -7,6 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   useEditor,
+  useLocale,
+  messages,
   useSidebarStore,
   type ViewMode,
 } from '@pascal-app/editor'
@@ -52,10 +54,9 @@ function ToolbarTooltip({ children, label }: { children: ReactNode; label: strin
   )
 }
 
-const VIEW_MODES: { id: ViewMode; label: string; icon: React.ReactNode }[] = [
+const VIEW_MODES: { id: ViewMode; icon: React.ReactNode }[] = [
   {
     id: '3d',
-    label: '3D',
     icon: (
       <Image
         alt=""
@@ -68,7 +69,6 @@ const VIEW_MODES: { id: ViewMode; label: string; icon: React.ReactNode }[] = [
   },
   {
     id: '2d',
-    label: '2D',
     icon: (
       <Image
         alt=""
@@ -81,43 +81,45 @@ const VIEW_MODES: { id: ViewMode; label: string; icon: React.ReactNode }[] = [
   },
   {
     id: 'split',
-    label: 'Split',
     icon: <Columns2 className="h-3 w-3" />,
   },
 ]
 
 const levelModeOrder = ['stacked', 'exploded', 'solo'] as const
-const levelModeLabels: Record<string, string> = {
-  manual: 'Stack',
-  stacked: 'Stack',
-  exploded: 'Exploded',
-  solo: 'Solo',
-}
 
 const wallModeOrder = ['cutaway', 'up', 'down'] as const
-const wallModeConfig: Record<string, { icon: string; label: string }> = {
-  up: { icon: '/icons/room.png', label: 'Full height' },
-  cutaway: { icon: '/icons/wallcut.png', label: 'Cutaway' },
-  down: { icon: '/icons/walllow.png', label: 'Low' },
+const wallModeConfig: Record<string, { icon: string }> = {
+  up: { icon: '/icons/room.png' },
+  cutaway: { icon: '/icons/wallcut.png' },
+  down: { icon: '/icons/walllow.png' },
 }
 
 const SHADING_OPTIONS = [
-  { id: 'solid', name: 'Solid', detail: 'Flat and fast — no ambient occlusion', icon: Box },
-  { id: 'rendered', name: 'Rendered', detail: 'Full ambient occlusion', icon: Sparkles },
+  { id: 'solid', nameKey: 'viewer.solid', detailKey: 'viewer.flatAndFast', icon: Box },
+  { id: 'rendered', nameKey: 'viewer.rendered', detailKey: 'viewer.fullAO', icon: Sparkles },
 ] as const
 
 function ViewModeControl() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const viewMode = useEditor((state) => state.viewMode)
   const setViewMode = useEditor((state) => state.setViewMode)
+
+  const modeLabels: Record<ViewMode, string> = {
+    '3d': t('viewer.viewMode3D'),
+    '2d': t('viewer.viewMode2D'),
+    split: t('viewer.viewModeSplit'),
+  }
 
   return (
     <div className={TOOLBAR_CONTAINER}>
       {VIEW_MODES.map((mode) => {
         const isActive = viewMode === mode.id
+        const label = modeLabels[mode.id]
         return (
-          <ToolbarTooltip key={mode.id} label={mode.label}>
+          <ToolbarTooltip key={mode.id} label={label}>
             <button
-              aria-label={mode.label}
+              aria-label={label}
               aria-pressed={isActive}
               className={cn(
                 'flex items-center justify-center gap-1.5 px-2.5 font-medium text-xs transition-colors',
@@ -129,7 +131,7 @@ function ViewModeControl() {
               type="button"
             >
               {mode.icon}
-              <span>{mode.label}</span>
+              <span>{label}</span>
             </button>
           </ToolbarTooltip>
         )
@@ -139,6 +141,8 @@ function ViewModeControl() {
 }
 
 function CollapseSidebarButton() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const isCollapsed = useSidebarStore((state) => state.isCollapsed)
   const setIsCollapsed = useSidebarStore((state) => state.setIsCollapsed)
 
@@ -148,9 +152,9 @@ function CollapseSidebarButton() {
 
   return (
     <div className={TOOLBAR_CONTAINER}>
-      <ToolbarTooltip label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+      <ToolbarTooltip label={isCollapsed ? t('viewer.expandSidebar') : t('viewer.collapseSidebar')}>
         <button
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={isCollapsed ? t('viewer.expandSidebar') : t('viewer.collapseSidebar')}
           className={TOOLBAR_BTN}
           onClick={toggle}
           type="button"
@@ -167,6 +171,8 @@ function CollapseSidebarButton() {
 }
 
 function LevelModeToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const levelMode = useViewer((state) => state.levelMode)
   const setLevelMode = useViewer((state) => state.setLevelMode)
   const isDefault = levelMode === 'stacked' || levelMode === 'manual'
@@ -182,7 +188,8 @@ function LevelModeToggle() {
     if (next) setLevelMode(next)
   }
 
-  const label = `Levels: ${levelMode === 'manual' ? 'Manual' : (levelModeLabels[levelMode] ?? 'Stack')}`
+  const levelLabels: Record<string, string> = { manual: t('viewer.manual'), stacked: t('viewer.stack'), exploded: t('viewer.exploded'), solo: t('viewer.solo') }
+  const label = `${t('viewer.levels')}: ${levelLabels[levelMode] ?? t('viewer.stack')}`
 
   return (
     <ToolbarTooltip label={label}>
@@ -202,13 +209,15 @@ function LevelModeToggle() {
         ) : (
           <IconifyIcon height={14} icon="charm:stack-push" width={14} />
         )}
-        <span className="font-medium text-xs">{levelModeLabels[levelMode] ?? 'Stack'}</span>
+        <span className="font-medium text-xs">{levelLabels[levelMode] ?? t('viewer.stack')}</span>
       </button>
     </ToolbarTooltip>
   )
 }
 
 function WallModeToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const wallMode = useViewer((state) => state.wallMode)
   const setWallMode = useViewer((state) => state.setWallMode)
   const config = wallModeConfig[wallMode] ?? wallModeConfig.cutaway!
@@ -219,8 +228,10 @@ function WallModeToggle() {
     if (next) setWallMode(next)
   }
 
+  const labelKey = wallMode === 'up' ? 'toolbar.fullHeight' : wallMode === 'down' ? 'toolbar.low' : 'toolbar.cutaway'
+
   return (
-    <ToolbarTooltip label={`Walls: ${config.label}`}>
+    <ToolbarTooltip label={`${t('toolbar.walls')}: ${t(labelKey)}`}>
       <button
         className={cn(
           TOOLBAR_BTN,
@@ -233,13 +244,15 @@ function WallModeToggle() {
         type="button"
       >
         <Image alt="" className="h-4 w-4 object-contain" height={16} src={config.icon} width={16} />
-        <span className="font-medium text-xs">{config.label}</span>
+        <span className="font-medium text-xs">{t(labelKey)}</span>
       </button>
     </ToolbarTooltip>
   )
 }
 
 function RenderModeMenu() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const shading = useViewer((state) => state.shading)
   const setShading = useViewer((state) => state.setShading)
   const active = SHADING_OPTIONS.find((option) => option.id === shading) ?? SHADING_OPTIONS[0]
@@ -247,10 +260,10 @@ function RenderModeMenu() {
 
   return (
     <DropdownMenu>
-      <ToolbarTooltip label={`Render: ${active.name}`}>
+      <ToolbarTooltip label={`${t('viewer.render')}: ${t(active.nameKey)}`}>
         <DropdownMenuTrigger asChild>
           <button
-            aria-label={`Render: ${active.name}`}
+            aria-label={`${t('viewer.render')}: ${t(active.nameKey)}`}
             className={cn(
               TOOLBAR_BTN,
               'w-auto gap-1.5 px-2.5',
@@ -259,7 +272,7 @@ function RenderModeMenu() {
             type="button"
           >
             <ActiveIcon className="h-3.5 w-3.5" />
-            <span className="font-medium text-xs">{active.name}</span>
+            <span className="font-medium text-xs">{t(active.nameKey)}</span>
           </button>
         </DropdownMenuTrigger>
       </ToolbarTooltip>
@@ -270,8 +283,8 @@ function RenderModeMenu() {
             <DropdownMenuItem key={option.id} onSelect={() => setShading(option.id)}>
               <OptionIcon className="h-4 w-4" />
               <div className="flex flex-col">
-                <span className="text-foreground">{option.name}</span>
-                <span className="text-muted-foreground text-xs">{option.detail}</span>
+                <span className="text-foreground">{t(option.nameKey)}</span>
+                <span className="text-muted-foreground text-xs">{t(option.detailKey)}</span>
               </div>
               {shading === option.id ? <Check className="ml-auto h-4 w-4 text-foreground" /> : null}
             </DropdownMenuItem>
@@ -283,16 +296,18 @@ function RenderModeMenu() {
 }
 
 function SceneThemeMenu() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const sceneTheme = useViewer((state) => state.sceneTheme)
   const setSceneTheme = useViewer((state) => state.setSceneTheme)
   const active = getSceneTheme(sceneTheme)
 
   return (
     <DropdownMenu>
-      <ToolbarTooltip label={`Scene theme: ${active.name}`}>
+      <ToolbarTooltip label={`${t('viewer.sceneTheme')}: ${active.name}`}>
         <DropdownMenuTrigger asChild>
           <button
-            aria-label={`Scene theme: ${active.name}`}
+            aria-label={`${t('viewer.sceneTheme')}: ${active.name}`}
             className={cn(TOOLBAR_BTN, 'w-28 gap-1.5 px-2.5 text-foreground/90')}
             type="button"
           >
@@ -329,22 +344,24 @@ function SceneThemeMenu() {
 }
 
 const EDGE_OPTIONS = [
-  { id: 'off', name: 'Off', detail: 'No edge lines' },
-  { id: 'soft', name: 'Soft', detail: 'Faint outline of major creases' },
-  { id: 'strong', name: 'Strong', detail: 'Crisp, opaque edge lines' },
-] as const satisfies readonly { id: EdgeMode; name: string; detail: string }[]
+  { id: 'off', nameKey: 'viewer.off_edge', detailKey: 'viewer.noEdgeLines' },
+  { id: 'soft', nameKey: 'viewer.soft', detailKey: 'viewer.faintOutline' },
+  { id: 'strong', nameKey: 'viewer.strong', detailKey: 'viewer.crispEdges' },
+] as const satisfies readonly { id: EdgeMode; nameKey: string; detailKey: string }[]
 
 function EdgesMenu() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const edges = useViewer((state) => state.edges)
   const setEdges = useViewer((state) => state.setEdges)
   const active = EDGE_OPTIONS.find((option) => option.id === edges) ?? EDGE_OPTIONS[0]
 
   return (
     <DropdownMenu>
-      <ToolbarTooltip label={`Edges: ${active.name}`}>
+      <ToolbarTooltip label={`${t('viewer.edges')}: ${t(active.nameKey)}`}>
         <DropdownMenuTrigger asChild>
           <button
-            aria-label={`Edges: ${active.name}`}
+            aria-label={`${t('viewer.edges')}: ${t(active.nameKey)}`}
             className={cn(TOOLBAR_BTN, edges !== 'off' && 'bg-white/10 text-foreground/90')}
             type="button"
           >
@@ -353,28 +370,32 @@ function EdgesMenu() {
         </DropdownMenuTrigger>
       </ToolbarTooltip>
       <DropdownMenuContent align="center" className="min-w-56" side="bottom">
-        {EDGE_OPTIONS.map((option) => (
-          <DropdownMenuItem key={option.id} onSelect={() => setEdges(option.id)}>
-            <div className="flex flex-col">
-              <span className="text-foreground">{option.name}</span>
-              <span className="text-muted-foreground text-xs">{option.detail}</span>
-            </div>
-            {edges === option.id ? <Check className="ml-auto h-4 w-4 text-foreground" /> : null}
-          </DropdownMenuItem>
-        ))}
+        {EDGE_OPTIONS.map((option) => {
+          return (
+            <DropdownMenuItem key={option.id} onSelect={() => setEdges(option.id)}>
+              <div className="flex flex-col">
+                <span className="text-foreground">{t(option.nameKey)}</span>
+                <span className="text-muted-foreground text-xs">{t(option.detailKey)}</span>
+              </div>
+              {edges === option.id ? <Check className="ml-auto h-4 w-4 text-foreground" /> : null}
+            </DropdownMenuItem>
+          )
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
 
 function GridVisibilityToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const showGrid = useViewer((state) => state.showGrid)
   const setShowGrid = useViewer((state) => state.setShowGrid)
 
   return (
-    <ToolbarTooltip label={`Grid: ${showGrid ? 'Visible' : 'Hidden'}`}>
+    <ToolbarTooltip label={`${t('viewer.grid')}: ${showGrid ? t('viewer.visible') : t('viewer.hidden')}`}>
       <button
-        aria-label={`Grid: ${showGrid ? 'Visible' : 'Hidden'}`}
+        aria-label={`${t('viewer.grid')}: ${showGrid ? t('viewer.visible') : t('viewer.hidden')}`}
         aria-pressed={showGrid}
         className={cn(
           TOOLBAR_BTN,
@@ -394,13 +415,15 @@ function GridVisibilityToggle() {
 }
 
 function ShadowsToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const shadows = useViewer((state) => state.shadows)
   const setShadows = useViewer((state) => state.setShadows)
 
   return (
-    <ToolbarTooltip label={`Shadows: ${shadows ? 'On' : 'Off'}`}>
+    <ToolbarTooltip label={`${t('viewer.shadows')}: ${shadows ? t('viewer.on') : t('viewer.off')}`}>
       <button
-        aria-label={`Shadows: ${shadows ? 'On' : 'Off'}`}
+        aria-label={`${t('viewer.shadows')}: ${shadows ? t('viewer.on') : t('viewer.off')}`}
         aria-pressed={shadows}
         className={cn(
           TOOLBAR_BTN,
@@ -418,11 +441,13 @@ function ShadowsToggle() {
 }
 
 function UnitToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const unit = useViewer((state) => state.unit)
   const setUnit = useViewer((state) => state.setUnit)
 
   return (
-    <ToolbarTooltip label={unit === 'metric' ? 'Metric (m)' : 'Imperial (ft)'}>
+    <ToolbarTooltip label={unit === 'metric' ? t('viewer.metric') : t('viewer.imperial')}>
       <button
         className={TOOLBAR_BTN}
         onClick={() => setUnit(unit === 'metric' ? 'imperial' : 'metric')}
@@ -435,11 +460,13 @@ function UnitToggle() {
 }
 
 function CameraModeToggle() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const cameraMode = useViewer((state) => state.cameraMode)
   const setCameraMode = useViewer((state) => state.setCameraMode)
 
   return (
-    <ToolbarTooltip label={cameraMode === 'perspective' ? 'Perspective' : 'Orthographic'}>
+    <ToolbarTooltip label={cameraMode === 'perspective' ? t('viewer.perspective') : t('viewer.orthographic')}>
       <button
         className={cn(
           TOOLBAR_BTN,
@@ -459,11 +486,13 @@ function CameraModeToggle() {
 }
 
 function WalkthroughButton() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
   const isFirstPersonMode = useEditor((state) => state.isFirstPersonMode)
   const setFirstPersonMode = useEditor((state) => state.setFirstPersonMode)
 
   return (
-    <ToolbarTooltip label="Walkthrough">
+    <ToolbarTooltip label={t('viewer.walkthrough')}>
       <button
         className={cn(
           TOOLBAR_BTN,
@@ -479,15 +508,18 @@ function WalkthroughButton() {
 }
 
 function PreviewButton() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
+
   return (
-    <ToolbarTooltip label="Preview mode">
+    <ToolbarTooltip label={t('controlModes.preview')}>
       <button
         className="flex items-center gap-1.5 px-2.5 font-medium text-muted-foreground/80 text-xs transition-colors hover:bg-white/8 hover:text-foreground/90"
         onClick={() => useEditor.getState().setPreviewMode(true)}
         type="button"
       >
         <Eye className="h-3.5 w-3.5 shrink-0" />
-        <span>Preview</span>
+        <span>{t('controlModes.preview')}</span>
       </button>
     </ToolbarTooltip>
   )

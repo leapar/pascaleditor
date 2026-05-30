@@ -1,3 +1,5 @@
+'use client'
+
 import {
   calculateLevelMiters,
   emitter,
@@ -21,6 +23,7 @@ import {
   type SegmentAngleReference,
   snapWallDraftPoint,
   triggerSFX,
+  useTranslations,
   WALL_FINE_GRID_STEP,
   type WallPlanPoint,
 } from '@pascal-app/editor'
@@ -125,12 +128,12 @@ function getWallEndpointKind(point: WallPlanPoint, wall: WallNode): 'start' | 'e
   return null
 }
 
-function buildDraftWall(start: WallPlanPoint, end: WallPlanPoint): WallNode {
+function buildDraftWall(start: WallPlanPoint, end: WallPlanPoint, name: string): WallNode {
   return {
     object: 'node',
     id: 'wall_draft' as WallNode['id'],
     type: 'wall',
-    name: 'Draft wall',
+    name,
     parentId: null,
     visible: true,
     metadata: {},
@@ -259,10 +262,11 @@ function getDraftAngleLabels(
   end: WallPlanPoint,
   walls: WallNode[],
   baseY: number,
+  draftName: string,
 ): DraftAngleLabel[] {
   const draftFromStart: WallPlanPoint = [end[0] - start[0], end[1] - start[1]]
   const draftFromEnd: WallPlanPoint = [start[0] - end[0], start[1] - end[1]]
-  const draftWall = buildDraftWall(start, end)
+  const draftWall = buildDraftWall(start, end, draftName)
   const miterData = calculateLevelMiters([...walls, draftWall])
   const endpoints = [
     { id: 'start', point: start, draftVector: draftFromStart },
@@ -335,6 +339,7 @@ function getDraftMeasurementState(
   walls: WallNode[],
   unit: 'metric' | 'imperial',
   baseY: number,
+  draftName: string,
 ): DraftMeasurementState {
   const dx = end[0] - start[0]
   const dz = end[1] - start[1]
@@ -343,7 +348,7 @@ function getDraftMeasurementState(
   return {
     lengthLabel: formatMeasurement(length, unit),
     lengthPosition: [(start[0] + end[0]) / 2, baseY + DRAFT_LABEL_Y, (start[1] + end[1]) / 2],
-    angleLabels: getDraftAngleLabels(start, end, walls, baseY),
+    angleLabels: getDraftAngleLabels(start, end, walls, baseY, draftName),
   }
 }
 
@@ -381,6 +386,7 @@ function getCurrentLevelWalls(): WallNode[] {
 }
 
 export const WallTool: React.FC = () => {
+  const t = useTranslations()
   const unit = useViewer((state) => state.unit)
   const isDark = useViewer((state) => getSceneTheme(state.sceneTheme).appearance === 'dark')
   const cursorRef = useRef<Group>(null)
@@ -442,6 +448,7 @@ export const WallTool: React.FC = () => {
             walls,
             unit,
             startingPoint.current.y,
+            t('nodes.wall.draftName'),
           ),
         )
       } else {

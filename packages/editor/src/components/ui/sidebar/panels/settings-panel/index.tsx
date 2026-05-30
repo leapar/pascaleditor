@@ -1,3 +1,5 @@
+'use client'
+
 import { emitter, useScene, validateBuildJson } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { TreeView, VisualJson } from '@visual-json/react'
@@ -10,15 +12,16 @@ import {
   useRef,
   useState,
 } from 'react'
-import { Button } from './../../../../../components/ui/primitives/button'
+import { Button } from '../../../../../components/ui/primitives/button'
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
-} from './../../../../../components/ui/primitives/dialog'
-import { Switch } from './../../../../../components/ui/primitives/switch'
-import useEditor, { selectDefaultBuildingAndLevel } from './../../../../../store/use-editor'
+} from '../../../../../components/ui/primitives/dialog'
+import { Switch } from '../../../../../components/ui/primitives/switch'
+import { messages, useLocale } from '../../../../../lib/i18n'
+import useEditor, { selectDefaultBuildingAndLevel } from '../../../../../store/use-editor'
 import { AudioSettingsDialog } from './audio-settings-dialog'
 import { KeyboardShortcutsDialog } from './keyboard-shortcuts-dialog'
 import { LoadBuildDialog, type PendingImport } from './load-build-dialog'
@@ -176,6 +179,8 @@ export function SettingsPanel({
   projectVisibility,
   onVisibilityChange,
 }: SettingsPanelProps = {}) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
   const fileInputRef = useRef<HTMLInputElement>(null)
   const nodes = useScene((state) => state.nodes)
   const rootNodeIds = useScene((state) => state.rootNodeIds)
@@ -298,12 +303,12 @@ export function SettingsPanel({
       {/* Visibility Section (only for cloud projects) */}
       {projectId && !isLocalProject && (
         <div className="space-y-3">
-          <label className="font-medium text-muted-foreground text-xs uppercase">Visibility</label>
+          <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.visibility')}</label>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm">Public</div>
+              <div className="font-medium text-sm">{t('settings.visibilityPublic')}</div>
               <div className="text-muted-foreground text-xs">
-                {projectVisibility?.isPrivate ? 'Only you' : 'Anyone'} can view
+                {projectVisibility?.isPrivate ? t('settings.visibilityOnlyYou') : t('settings.visibilityAnyone')} {t('settings.visibilityCanView')}
               </div>
             </div>
             <Switch
@@ -313,8 +318,8 @@ export function SettingsPanel({
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm">Show 3D Scans</div>
-              <div className="text-muted-foreground text-xs">Visible to public viewers</div>
+              <div className="font-medium text-sm">{t('settings.visibilityShow3DScans')}</div>
+              <div className="text-muted-foreground text-xs">{t('settings.visibilityVisiblePublic')}</div>
             </div>
             <Switch
               checked={projectVisibility?.showScansPublic ?? true}
@@ -323,8 +328,8 @@ export function SettingsPanel({
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm">Show Floorplans</div>
-              <div className="text-muted-foreground text-xs">Visible to public viewers</div>
+              <div className="font-medium text-sm">{t('settings.visibilityShowFloorplans')}</div>
+              <div className="text-muted-foreground text-xs">{t('settings.visibilityVisiblePublic')}</div>
             </div>
             <Switch
               checked={projectVisibility?.showGuidesPublic ?? true}
@@ -333,8 +338,8 @@ export function SettingsPanel({
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm">Show Grid</div>
-              <div className="text-muted-foreground text-xs">Visible only in the editor</div>
+              <div className="font-medium text-sm">{t('settings.visibilityShowGrid')}</div>
+              <div className="text-muted-foreground text-xs">{t('settings.visibilityEditorOnly')}</div>
             </div>
             <Switch
               checked={showGrid}
@@ -343,8 +348,8 @@ export function SettingsPanel({
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium text-sm">Shadows</div>
-              <div className="text-muted-foreground text-xs">Cast shadows from lights</div>
+              <div className="font-medium text-sm">{t('settings.shadows')}</div>
+              <div className="text-muted-foreground text-xs">{t('settings.visibilityCastShadows')}</div>
             </div>
             <Switch
               checked={shadows}
@@ -356,14 +361,14 @@ export function SettingsPanel({
 
       {/* Export Section */}
       <div className="space-y-2">
-        <label className="font-medium text-muted-foreground text-xs uppercase">Export</label>
+        <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.export')}</label>
         <Button
           className="w-full justify-start gap-2"
           onClick={() => exportScene?.('glb')}
           variant="outline"
         >
           <Download className="size-4" />
-          Export GLB
+          {t('settings.exportedGLB')}
         </Button>
         <Button
           className="w-full justify-start gap-2"
@@ -371,7 +376,7 @@ export function SettingsPanel({
           variant="outline"
         >
           <Download className="size-4" />
-          Export STL
+          {t('settings.exportedSTL')}
         </Button>
         <Button
           className="w-full justify-start gap-2"
@@ -379,14 +384,14 @@ export function SettingsPanel({
           variant="outline"
         >
           <Download className="size-4" />
-          Export OBJ
+          {t('settings.exportedOBJ')}
         </Button>
       </div>
 
       {/* Thumbnail Section (only for cloud projects) */}
       {projectId && !isLocalProject && (
         <div className="space-y-2">
-          <label className="font-medium text-muted-foreground text-xs uppercase">Thumbnail</label>
+          <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.thumbnail')}</label>
           <Button
             className="w-full justify-start gap-2"
             disabled={isGeneratingThumbnail}
@@ -394,18 +399,18 @@ export function SettingsPanel({
             variant="outline"
           >
             <Camera className="size-4" />
-            {isGeneratingThumbnail ? 'Generating...' : 'Generate Thumbnail'}
+            {isGeneratingThumbnail ? t('settings.exporting') : t('settings.generateThumbnail')}
           </Button>
         </div>
       )}
 
       {/* Save/Load Section */}
       <div className="space-y-2">
-        <label className="font-medium text-muted-foreground text-xs uppercase">Save & Load</label>
+        <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.saveAndLoad')}</label>
 
         <Button className="w-full justify-start gap-2" onClick={handleSaveBuild} variant="outline">
           <Save className="size-4" />
-          Save Build
+          {t('settings.saveBuild')}
         </Button>
 
         <Button
@@ -414,7 +419,7 @@ export function SettingsPanel({
           variant="outline"
         >
           <Upload className="size-4" />
-          Load Build
+          {t('settings.loadBuild')}
         </Button>
 
         <input
@@ -434,27 +439,27 @@ export function SettingsPanel({
 
       {/* Audio Section */}
       <div className="space-y-2">
-        <label className="font-medium text-muted-foreground text-xs uppercase">Audio</label>
+        <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.audio')}</label>
         <AudioSettingsDialog />
       </div>
 
       {/* Keyboard Section */}
       <div className="space-y-2">
-        <label className="font-medium text-muted-foreground text-xs uppercase">Keyboard</label>
+        <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.keyboard')}</label>
         <KeyboardShortcutsDialog />
       </div>
 
       {/* Scene Graph */}
       <div className="space-y-1">
-        <label className="font-medium text-muted-foreground text-xs uppercase">Scene Graph</label>
+        <label className="font-medium text-muted-foreground text-xs uppercase">{t('settings.sceneGraph')}</label>
         <Dialog>
           <DialogTrigger asChild>
             <Button className="h-auto justify-start p-0 text-sm" variant="link">
-              Explore scene graph
+              {t('settings.exploreSceneGraph')}
             </Button>
           </DialogTrigger>
           <DialogContent className="h-[80vh] max-w-[95vw] gap-0 overflow-hidden border-0 bg-[#1e1e1e] p-0 shadow-none sm:max-w-5xl">
-            <DialogTitle className="sr-only">Scene Graph</DialogTitle>
+            <DialogTitle className="sr-only">{t('settings.sceneGraph')}</DialogTitle>
             <div
               className="flex h-full min-h-0 w-full min-w-0 *:h-full *:w-full *:overflow-y-auto"
               onContextMenuCapture={blockSceneGraphMutations}
@@ -472,7 +477,7 @@ export function SettingsPanel({
 
       {/* Danger Zone */}
       <div className="space-y-2">
-        <label className="font-medium text-destructive text-xs uppercase">Danger Zone</label>
+        <label className="font-medium text-destructive text-xs uppercase">{t('settings.dangerZone')}</label>
 
         <Button
           className="w-full justify-start gap-2"
@@ -480,7 +485,7 @@ export function SettingsPanel({
           variant="destructive"
         >
           <Trash2 className="size-4" />
-          Clear & Start New
+          {t('settings.clearAndStartNew')}
         </Button>
       </div>
     </div>

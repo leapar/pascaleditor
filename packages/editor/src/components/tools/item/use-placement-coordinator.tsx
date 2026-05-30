@@ -1,3 +1,5 @@
+'use client'
+
 import type { AssetInput } from '@pascal-app/core'
 import {
   type AnyNodeId,

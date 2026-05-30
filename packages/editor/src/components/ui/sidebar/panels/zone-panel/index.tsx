@@ -1,3 +1,5 @@
+'use client'
+
 import { emitter, useScene, type ZoneNode } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { Camera, Hexagon, Trash2 } from 'lucide-react'
@@ -9,9 +11,12 @@ import {
   PopoverTrigger,
 } from './../../../../../components/ui/primitives/popover'
 import { cn } from './../../../../../lib/utils'
+import { messages, useLocale } from '../../../../../lib/i18n'
 import useEditor from './../../../../../store/use-editor'
 
 function ZoneItem({ zone }: { zone: ZoneNode }) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
   const [cameraPopoverOpen, setCameraPopoverOpen] = useState(false)
   const deleteNode = useScene((state) => state.deleteNode)
   const updateNode = useScene((state) => state.updateNode)
@@ -57,7 +62,7 @@ function ZoneItem({ zone }: { zone: ZoneNode }) {
           <button
             className="relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground opacity-0 transition-colors hover:bg-black/5 hover:text-foreground group-hover/row:opacity-100 dark:hover:bg-white/10"
             onClick={(e) => e.stopPropagation()}
-            title="Camera snapshot"
+            title={t('treeActions.cameraSnapshot')}
           >
             <Camera className="h-3 w-3" />
             {zone.camera && (
@@ -82,7 +87,7 @@ function ZoneItem({ zone }: { zone: ZoneNode }) {
                 }}
               >
                 <Camera className="h-3.5 w-3.5" />
-                View snapshot
+                {t('treeActions.viewSnapshot')}
               </button>
             )}
             <button
@@ -94,7 +99,7 @@ function ZoneItem({ zone }: { zone: ZoneNode }) {
               }}
             >
               <Camera className="h-3.5 w-3.5" />
-              {zone.camera ? 'Update snapshot' : 'Take snapshot'}
+              {zone.camera ? t('treeActions.updateSnapshot') : t('treeActions.takeSnapshot')}
             </button>
             {zone.camera && (
               <button
@@ -106,7 +111,7 @@ function ZoneItem({ zone }: { zone: ZoneNode }) {
                 }}
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                Clear snapshot
+                {t('treeActions.clearSnapshot')}
               </button>
             )}
           </div>
@@ -123,6 +128,8 @@ function ZoneItem({ zone }: { zone: ZoneNode }) {
 }
 
 export function ZonePanel() {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
   const nodes = useScene((state) => state.nodes)
   const currentLevelId = useViewer((state) => state.selection.levelId)
   const setPhase = useEditor((state) => state.setPhase)
@@ -145,7 +152,7 @@ export function ZonePanel() {
   if (!currentLevelId) {
     return (
       <div className="px-3 py-4 text-muted-foreground text-sm">
-        Select a level to view and create zones
+        {t('zone.selectLevelToView')}
       </div>
     )
   }
@@ -154,9 +161,9 @@ export function ZonePanel() {
     <div className="py-1">
       {levelZones.length === 0 ? (
         <div className="px-3 py-4 text-muted-foreground text-sm">
-          No zones on this level.{' '}
+          {t('zone.noZonesOnLevel')}{' '}
           <button className="cursor-pointer text-primary hover:underline" onClick={handleAddZone}>
-            Add one
+            {t('zone.addOne')}
           </button>
         </div>
       ) : (

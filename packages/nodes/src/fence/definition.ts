@@ -219,13 +219,13 @@ export const fenceDefinition: NodeDefinition<typeof FenceNode> = {
   },
 
   toolHints: [
-    { key: 'Left click', label: 'Set fence start / end' },
-    { key: 'Shift', label: 'Allow non-45° angles' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.fence.toolHints.setStartEnd' },
+    { key: 'Shift', label: 'nodes.fence.toolHints.allowAngles' },
+    { key: 'Esc', label: 'nodes.fence.toolHints.cancel' },
   ],
 
   presentation: {
-    label: 'Fence',
+    label: 'nodes.fence.label',
     description: 'A straight or curved fence segment with configurable posts and infill.',
     icon: { kind: 'url', src: '/icons/fence.png' },
     paletteSection: 'structure',

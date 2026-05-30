@@ -1,6 +1,7 @@
 'use client'
 
 import { type AnyNodeId, DormerNode, useScene } from '@pascal-app/core'
+import { useTranslations } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useMemo } from 'react'
 import { dormerDefinition } from './definition'
@@ -34,6 +35,7 @@ function nextDormerNumber(nodes: Record<string, unknown>): number {
  * registry) so the user sees exactly where the dormer will land.
  */
 const DormerTool = () => {
+  const t = useTranslations()
   const setSelection = useViewer((s) => s.setSelection)
 
   const previewNode = useMemo(
@@ -50,9 +52,10 @@ const DormerTool = () => {
   const { activeBuildingId, segmentXform, hitLocal, ghostRotation } = useDormerPlacement({
     onCommit: (hit, rotation) => {
       const state = useScene.getState()
+      const dormerNumber = nextDormerNumber(state.nodes)
       const dormer = DormerNode.parse({
         ...dormerDefinition.defaults(),
-        name: `Dormer ${nextDormerNumber(state.nodes)}`,
+        name: t('nodes.dormer.defaultName', { count: dormerNumber }),
         roofSegmentId: hit.segment.id,
         parentId: hit.segment.id,
         // Anchor at the slope height so the renderer matches the ghost.

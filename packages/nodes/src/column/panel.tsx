@@ -17,6 +17,7 @@ import {
   ToggleControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Move, Trash2 } from 'lucide-react'
@@ -83,17 +84,17 @@ const COLUMN_PROPORTION_OPTIONS = Object.entries(COLUMN_PROPORTION_PRESETS).map(
 )
 
 const SUPPORT_STYLE_OPTIONS: Array<{ label: string; value: ColumnNode['supportStyle'] }> = [
-  { label: 'Vertical', value: 'vertical' },
-  { label: 'A-Frame', value: 'a-frame' },
-  { label: 'Y Support', value: 'y-frame' },
-  { label: 'V Support', value: 'v-frame' },
-  { label: 'X Brace', value: 'x-brace' },
-  { label: 'K Brace', value: 'k-brace' },
-  { label: 'Single Strut', value: 'single-strut' },
-  { label: 'Tripod', value: 'tripod' },
-  { label: 'Trestle', value: 'trestle' },
-  { label: 'Portal Frame', value: 'portal-frame' },
-  { label: 'Box Frame', value: 'box-frame' },
+  { label: 'nodes.column.vertical', value: 'vertical' },
+  { label: 'nodes.column.aFrame', value: 'a-frame' },
+  { label: 'nodes.column.yFrame', value: 'y-frame' },
+  { label: 'nodes.column.vFrame', value: 'v-frame' },
+  { label: 'nodes.column.xBrace', value: 'x-brace' },
+  { label: 'nodes.column.kBrace', value: 'k-brace' },
+  { label: 'nodes.column.singleStrut', value: 'single-strut' },
+  { label: 'nodes.column.tripod', value: 'tripod' },
+  { label: 'nodes.column.trestle', value: 'trestle' },
+  { label: 'nodes.column.portalFrame', value: 'portal-frame' },
+  { label: 'nodes.column.boxFrame', value: 'box-frame' },
 ]
 
 type NonVerticalSupportStyle = Exclude<ColumnNode['supportStyle'], 'vertical'>
@@ -259,6 +260,9 @@ function shaftProfileUpdates(shaftProfile: ColumnNode['shaftProfile']): Partial<
 }
 
 export default function ColumnPanel() {
+  const t = useTranslations()
+  const resolveOpts = (opts: { label: string; value: any }[]) =>
+    opts.map((o) => ({ ...o, label: t(o.label) }))
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const selectedCount = useViewer((s) => s.selection.selectedIds.length)
   const setSelection = useViewer((s) => s.setSelection)
@@ -315,10 +319,10 @@ export default function ColumnPanel() {
     <PanelWrapper
       icon="/icons/column.png"
       onClose={handleClose}
-      title={node.name || 'Column'}
+      title={node.name || t('nodes.column.fallbackTitle')}
       width={300}
     >
-      <PanelSection title="Preset">
+      <PanelSection title={(t('nodes.column.applyPreset').split(' ')[0] || '')}>
         <select
           className={SELECT_CLASS}
           onChange={(event) => {
@@ -327,7 +331,7 @@ export default function ColumnPanel() {
           }}
           value=""
         >
-          <option value="">Apply preset...</option>
+          <option value="">{t('nodes.column.applyPreset')}</option>
           {COLUMN_PRESET_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -336,9 +340,9 @@ export default function ColumnPanel() {
         </select>
       </PanelSection>
 
-      <PanelSection title="Shape">
+      <PanelSection title={t('common.dimensions').split(' ')[0] || 'Shape'}>
         <div className="grid grid-cols-2 gap-2 px-1 pt-1">
-          {SUPPORT_STYLE_OPTIONS.map((option) => {
+          {resolveOpts(SUPPORT_STYLE_OPTIONS).map((option) => {
             const isSelected = supportStyle === option.value
             return (
               <button
@@ -357,7 +361,7 @@ export default function ColumnPanel() {
                   const stylePreset =
                     option.value === 'vertical'
                       ? {}
-                      : SUPPORT_STYLE_DEFAULTS[option.value]
+                      : SUPPORT_STYLE_DEFAULTS[option.value as NonVerticalSupportStyle]
                   handleUpdate({
                     supportStyle: option.value,
                     ...(option.value !== 'vertical'
@@ -382,7 +386,7 @@ export default function ColumnPanel() {
         {isBraceSupport ? (
           <>
             <SliderControl
-              label="Brace Width"
+              label={t('nodes.column.braceWidth')}
               max={0.8}
               min={0.04}
               onChange={(value) => handleUpdate({ braceWidth: value, width: value })}
@@ -392,7 +396,7 @@ export default function ColumnPanel() {
               value={node.braceWidth ?? node.width}
             />
             <SliderControl
-              label="Brace Depth"
+              label={t('nodes.column.braceDepth')}
               max={0.8}
               min={0.04}
               onChange={(value) => handleUpdate({ braceDepth: value, depth: value })}

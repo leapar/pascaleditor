@@ -1,3 +1,5 @@
+'use client'
+
 import { useScene, type ZoneNode } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { memo, useCallback, useState } from 'react'
@@ -36,7 +38,8 @@ export const ZoneTreeNode = memo(function ZoneTreeNode({
 
   // Calculate approximate area from polygon
   const area = calculatePolygonArea(polygon).toFixed(1)
-  const defaultName = `Zone (${area}m²)`
+  const defaultName = 'nodeTypes.zoneWithArea'
+  const defaultNameParams = { area }
 
   return (
     <TreeNodeWrapper
@@ -54,6 +57,7 @@ export const ZoneTreeNode = memo(function ZoneTreeNode({
       label={
         <InlineRenameInput
           defaultName={defaultName}
+          defaultNameParams={defaultNameParams}
           isEditing={isEditing}
           nodeId={nodeId}
           onStartEditing={handleStartEditing}

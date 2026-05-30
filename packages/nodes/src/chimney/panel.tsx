@@ -19,6 +19,7 @@ import {
   SegmentedControl,
   SliderControl,
   triggerSFX,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Trash2 } from 'lucide-react'
@@ -49,6 +50,7 @@ const CHIMNEY_TYPE_OPTIONS: Array<{ label: string; value: ChimneyType }> = [
 ]
 
 export default function ChimneyPanel() {
+  const t = useTranslations()
   const [chimneyType, setChimneyType] = useState<ChimneyType>('cap')
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
@@ -341,7 +343,7 @@ export default function ChimneyPanel() {
       icon="/icons/roof.png"
       onBack={node.roofSegmentId ? handleBack : undefined}
       onClose={handleClose}
-      title={node.name || 'Chimney'}
+      title={node.name || t('nodes.chimney.fallbackTitle')}
       width={300}
     >
       <PanelSection title="Style">

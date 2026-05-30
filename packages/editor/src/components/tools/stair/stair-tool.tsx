@@ -1,3 +1,5 @@
+'use client'
+
 import {
   emitter,
   type GridEvent,

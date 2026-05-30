@@ -1,3 +1,5 @@
+'use client'
+
 import { emitter, type GridEvent, type LevelNode, useScene, ZoneNode } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useMemo, useRef, useState } from 'react'

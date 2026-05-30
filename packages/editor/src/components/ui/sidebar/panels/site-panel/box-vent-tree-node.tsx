@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, type BoxVentNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import Image from 'next/image'
@@ -42,7 +44,7 @@ export const BoxVentTreeNode = memo(function BoxVentTreeNode({
     [nodeId, setSelection],
   )
 
-  const defaultName = node?.name || 'Box Vent'
+  const defaultName = node?.name || 'nodeTypes.boxVent'
 
   return (
     <TreeNodeWrapper

@@ -1,3 +1,5 @@
+'use client'
+
 import { type AnyNodeId, type CeilingNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import Image from 'next/image'
@@ -76,7 +78,8 @@ export const CeilingTreeNode = memo(function CeilingTreeNode({
   const handleStopEditing = useCallback(() => setIsEditing(false), [])
 
   const area = calculatePolygonArea(polygon).toFixed(1)
-  const defaultName = `Ceiling (${area}m²)`
+  const defaultName = 'nodeTypes.ceilingWithArea'
+  const defaultNameParams = { area }
 
   return (
     <TreeNodeWrapper
@@ -94,6 +97,7 @@ export const CeilingTreeNode = memo(function CeilingTreeNode({
       label={
         <InlineRenameInput
           defaultName={defaultName}
+          defaultNameParams={defaultNameParams}
           isEditing={isEditing}
           nodeId={nodeId as AnyNodeId}
           onStartEditing={handleStartEditing}

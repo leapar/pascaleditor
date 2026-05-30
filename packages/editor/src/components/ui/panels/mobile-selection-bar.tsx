@@ -5,6 +5,7 @@ import { Copy, Move, SlidersHorizontal, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import type { MouseEventHandler } from 'react'
 import { cn } from '../../../lib/utils'
+import { messages, useLocale } from '../../../lib/i18n'
 import { getNodeDisplay } from './node-display'
 
 interface MobileSelectionBarProps {
@@ -25,7 +26,9 @@ export function MobileSelectionBar({
   onDelete,
   onEdit,
 }: MobileSelectionBarProps) {
-  const { icon, label } = getNodeDisplay(node)
+  const { locale } = useLocale()
+  const { icon, labelKey } = getNodeDisplay(node)
+  const label = labelKey.includes('.') ? (messages[locale] as Record<string, string>)[labelKey] || labelKey : labelKey
 
   const stop: MouseEventHandler<HTMLButtonElement> = (e) => e.stopPropagation()
 

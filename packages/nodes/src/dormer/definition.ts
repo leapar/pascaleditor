@@ -77,13 +77,13 @@ export const dormerDefinition: NodeDefinition<typeof DormerNode> = {
 
   tool: () => import('./tool'),
   toolHints: [
-    { key: 'Left click', label: 'Place dormer on roof' },
-    { key: 'R / Shift+R', label: 'Rotate ghost ±15°' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.dormer.toolHints.place' },
+    { key: 'R / Shift+R', label: 'nodes.dormer.toolHints.rotateGhost' },
+    { key: 'Esc', label: 'common.cancel' },
   ],
 
   presentation: {
-    label: 'Dormer',
+    label: 'nodes.dormer.label',
     description: 'House-shaped protrusion on a roof segment.',
     icon: { kind: 'url', src: '/icons/roof.png' },
     paletteSection: 'structure',

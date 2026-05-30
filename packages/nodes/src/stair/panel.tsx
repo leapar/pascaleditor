@@ -26,6 +26,7 @@ import {
   ToggleControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Copy, Move, Plus, Trash2 } from 'lucide-react'
@@ -33,29 +34,32 @@ import { useCallback } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 
 const RAILING_MODE_OPTIONS: { label: string; value: StairRailingMode }[] = [
-  { label: 'None', value: 'none' },
-  { label: 'Left', value: 'left' },
-  { label: 'Right', value: 'right' },
-  { label: 'Both', value: 'both' },
+  { label: 'nodes.stair.none', value: 'none' },
+  { label: 'nodes.stair.left', value: 'left' },
+  { label: 'nodes.stair.right', value: 'right' },
+  { label: 'nodes.stair.both', value: 'both' },
 ]
 
 const STAIR_TYPE_OPTIONS: { label: string; value: StairType }[] = [
-  { label: 'Straight', value: 'straight' },
-  { label: 'Curved', value: 'curved' },
-  { label: 'Spiral', value: 'spiral' },
+  { label: 'nodes.stair.straight', value: 'straight' },
+  { label: 'nodes.stair.curved', value: 'curved' },
+  { label: 'nodes.stair.spiral', value: 'spiral' },
 ]
 
 const TOP_LANDING_MODE_OPTIONS: { label: string; value: StairTopLandingMode }[] = [
-  { label: 'None', value: 'none' },
-  { label: 'Integrated', value: 'integrated' },
+  { label: 'nodes.stair.none', value: 'none' },
+  { label: 'nodes.stair.integrated', value: 'integrated' },
 ]
 
 const STAIR_SLAB_OPENING_OPTIONS: { label: string; value: StairSlabOpeningMode }[] = [
-  { label: 'None', value: 'none' },
-  { label: 'Destination', value: 'destination' },
+  { label: 'nodes.stair.none', value: 'none' },
+  { label: 'nodes.stair.destination', value: 'destination' },
 ]
 
 export default function StairPanel() {
+  const t = useTranslations()
+  const resolveOpts = (opts: { label: string; value: any }[]) =>
+    opts.map((o) => ({ ...o, label: t(o.label) }))
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const selectedCount = useViewer((s) => s.selection.selectedIds.length)
   const setSelection = useViewer((s) => s.setSelection)
@@ -191,10 +195,10 @@ export default function StairPanel() {
     <PanelWrapper
       icon="/icons/stairs.png"
       onClose={handleClose}
-      title={node.name || 'Staircase'}
+      title={node.name || t('nodes.stair.fallbackTitle')}
       width={300}
     >
-      <PanelSection title="Type">
+      <PanelSection title={t('nodes.stair.type')}>
         <SegmentedControl
           onChange={(value) =>
             handleUpdate(
@@ -207,16 +211,16 @@ export default function StairPanel() {
                 : { stairType: value },
             )
           }
-          options={STAIR_TYPE_OPTIONS}
+          options={resolveOpts(STAIR_TYPE_OPTIONS)}
           value={node.stairType ?? 'straight'}
         />
       </PanelSection>
 
-      <PanelSection title="Opening">
+      <PanelSection title={t('nodes.stair.opening')}>
         <div className="space-y-3">
           <ToggleControl
             checked={(node.slabOpeningMode ?? 'none') === 'destination'}
-            label="Auto Cutout"
+            label={t('nodes.stair.autoCutout')}
             onChange={(checked) =>
               handleUpdate({
                 slabOpeningMode: checked ? 'destination' : 'none',
@@ -226,7 +230,7 @@ export default function StairPanel() {
 
           <div className="space-y-1.5">
             <div className="px-1 text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
-              From Level
+              {t('nodes.stair.fromLevel')}
             </div>
             <select
               className="h-9 w-full rounded-lg border border-border/50 bg-[#2C2C2E] px-3 text-foreground text-sm"
@@ -243,7 +247,7 @@ export default function StairPanel() {
 
           <div className="space-y-1.5">
             <div className="px-1 text-[11px] text-muted-foreground uppercase tracking-[0.14em]">
-              To Level
+              {t('nodes.stair.toLevel')}
             </div>
             <select
               className="h-9 w-full rounded-lg border border-border/50 bg-[#2C2C2E] px-3 text-foreground text-sm"
@@ -260,13 +264,13 @@ export default function StairPanel() {
 
           <SegmentedControl
             onChange={(value) => handleUpdate({ slabOpeningMode: value as StairSlabOpeningMode })}
-            options={STAIR_SLAB_OPENING_OPTIONS}
+            options={resolveOpts(STAIR_SLAB_OPENING_OPTIONS)}
             value={node.slabOpeningMode ?? 'none'}
           />
 
           {(node.slabOpeningMode ?? 'none') === 'destination' ? (
             <MetricControl
-              label="Opening Offset"
+              label={t('nodes.stair.openingOffset')}
               max={0.5}
               min={0}
               onChange={(value) => handleUpdate({ openingOffset: value })}
@@ -280,7 +284,7 @@ export default function StairPanel() {
       </PanelSection>
 
       {node.stairType === 'straight' && (
-        <PanelSection title="Segments">
+        <PanelSection title={t('nodes.stair.segments')}>
           <div className="flex flex-col gap-1">
             {segments.map((seg, i) => (
               <button
@@ -297,12 +301,12 @@ export default function StairPanel() {
           <div className="flex gap-1.5">
             <ActionButton
               icon={<Plus className="h-3.5 w-3.5" />}
-              label="Add flight"
+              label={t('nodes.stair.addFlight')}
               onClick={handleAddFlight}
             />
             <ActionButton
               icon={<Plus className="h-3.5 w-3.5" />}
-              label="Add landing"
+              label={t('nodes.stair.addLanding')}
               onClick={handleAddLanding}
             />
           </div>
@@ -310,9 +314,9 @@ export default function StairPanel() {
       )}
 
       {(node.stairType === 'curved' || node.stairType === 'spiral') && (
-        <PanelSection title="Geometry">
+        <PanelSection title={t('nodes.stair.geometry')}>
           <MetricControl
-            label="Width"
+            label={t('common.width')}
             max={10}
             min={0.4}
             onChange={(value) => handleUpdate({ width: value })}
@@ -322,7 +326,7 @@ export default function StairPanel() {
             value={Math.round((node.width ?? 1) * 100) / 100}
           />
           <MetricControl
-            label="Rise"
+            label={t('nodes.stair.rise')}
             max={10}
             min={0.2}
             onChange={(value) => handleUpdate({ totalRise: value })}
@@ -332,7 +336,7 @@ export default function StairPanel() {
             value={Math.round((node.totalRise ?? 2.5) * 100) / 100}
           />
           <MetricControl
-            label="Steps"
+            label={t('nodes.stair.steps')}
             max={32}
             min={2}
             onChange={(value) => handleUpdate({ stepCount: Math.max(2, Math.round(value)) })}
@@ -344,13 +348,13 @@ export default function StairPanel() {
           {node.stairType !== 'spiral' && (
             <ToggleControl
               checked={node.fillToFloor ?? true}
-              label="Fit To Floor"
+              label={t('nodes.stair.fitToFloor')}
               onChange={(checked) => handleUpdate({ fillToFloor: checked })}
             />
           )}
           {(node.stairType === 'spiral' || !(node.fillToFloor ?? true)) && (
             <MetricControl
-              label="Thickness"
+              label={t('common.thickness')}
               max={1}
               min={0.02}
               onChange={(value) => handleUpdate({ thickness: value })}
@@ -361,7 +365,7 @@ export default function StairPanel() {
             />
           )}
           <MetricControl
-            label="Inner Radius"
+            label={t('nodes.stair.innerRadius')}
             max={10}
             min={node.stairType === 'spiral' ? 0.05 : 0.2}
             onChange={(value) => handleUpdate({ innerRadius: value })}
@@ -371,7 +375,7 @@ export default function StairPanel() {
             value={Math.round((node.innerRadius ?? 0.9) * 100) / 100}
           />
           <SliderControl
-            label="Sweep"
+            label={t('nodes.stair.sweep')}
             max={node.stairType === 'spiral' ? 720 : 270}
             min={node.stairType === 'spiral' ? -720 : -270}
             onChange={(degrees) => handleUpdate({ sweepAngle: (degrees * Math.PI) / 180 })}
@@ -384,12 +388,12 @@ export default function StairPanel() {
             <>
               <SegmentedControl
                 onChange={(value) => handleUpdate({ topLandingMode: value })}
-                options={TOP_LANDING_MODE_OPTIONS}
+                options={resolveOpts(TOP_LANDING_MODE_OPTIONS)}
                 value={node.topLandingMode ?? 'none'}
               />
               {(node.topLandingMode ?? 'none') === 'integrated' && (
                 <MetricControl
-                  label="Top Landing"
+                  label={t('nodes.stair.topLanding')}
                   max={5}
                   min={0.3}
                   onChange={(value) => handleUpdate({ topLandingDepth: value })}
@@ -401,12 +405,12 @@ export default function StairPanel() {
               )}
               <ToggleControl
                 checked={node.showCenterColumn ?? true}
-                label="Center Column"
+                label={t('nodes.stair.centerColumn')}
                 onChange={(checked) => handleUpdate({ showCenterColumn: checked })}
               />
               <ToggleControl
                 checked={node.showStepSupports ?? true}
-                label="Step Supports"
+                label={t('nodes.stair.stepSupports')}
                 onChange={(checked) => handleUpdate({ showStepSupports: checked })}
               />
             </>
@@ -414,7 +418,7 @@ export default function StairPanel() {
         </PanelSection>
       )}
 
-      <PanelSection title="Position">
+      <PanelSection title={t('common.position')}>
         <SliderControl
           label="X"
           max={50}
@@ -458,7 +462,7 @@ export default function StairPanel() {
           value={Math.round(node.position[2] * 100) / 100}
         />
         <SliderControl
-          label="Rotation"
+          label={t('common.rotate')}
           max={180}
           min={-180}
           onChange={(degrees) => {
@@ -471,14 +475,14 @@ export default function StairPanel() {
         />
         <div className="flex gap-1.5 px-1 pt-2 pb-1">
           <ActionButton
-            label="-45°"
+            label={t('nodes.stair.rotationPresets.negative')}
             onClick={() => {
               triggerSFX('sfx:item-rotate')
               handleUpdate({ rotation: node.rotation - Math.PI / 4 })
             }}
           />
           <ActionButton
-            label="+45°"
+            label={t('nodes.stair.rotationPresets.positive')}
             onClick={() => {
               triggerSFX('sfx:item-rotate')
               handleUpdate({ rotation: node.rotation + Math.PI / 4 })
@@ -487,15 +491,15 @@ export default function StairPanel() {
         </div>
       </PanelSection>
 
-      <PanelSection title="Railing">
+      <PanelSection title={t('nodes.stair.railing')}>
         <SegmentedControl
           onChange={(value) => handleUpdate({ railingMode: value })}
-          options={RAILING_MODE_OPTIONS}
+          options={resolveOpts(RAILING_MODE_OPTIONS)}
           value={node.railingMode ?? 'none'}
         />
         {(node.railingMode ?? 'none') !== 'none' && (
           <SliderControl
-            label="Height"
+            label={t('common.height')}
             max={1.4}
             min={0.7}
             onChange={(value) => handleUpdate({ railingHeight: value })}
@@ -507,18 +511,18 @@ export default function StairPanel() {
         )}
       </PanelSection>
 
-      <PanelSection title="Actions">
+      <PanelSection title={t('common.actions')}>
         <ActionGroup>
-          <ActionButton icon={<Move className="h-3.5 w-3.5" />} label="Move" onClick={handleMove} />
+          <ActionButton icon={<Move className="h-3.5 w-3.5" />} label={t('common.move')} onClick={handleMove} />
           <ActionButton
             icon={<Copy className="h-3.5 w-3.5" />}
-            label="Duplicate"
+            label={t('common.duplicate')}
             onClick={handleDuplicate}
           />
           <ActionButton
             className="hover:bg-red-500/20"
             icon={<Trash2 className="h-3.5 w-3.5 text-red-400" />}
-            label="Delete"
+            label={t('common.delete')}
             onClick={handleDelete}
           />
         </ActionGroup>

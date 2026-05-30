@@ -48,3 +48,5 @@ og-test
 
 # Worktrees
 .worktrees
+/bin
+*.lock

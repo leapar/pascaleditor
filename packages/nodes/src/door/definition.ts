@@ -191,13 +191,13 @@ export const doorDefinition: NodeDefinition<typeof DoorNode> = {
   },
 
   toolHints: [
-    { key: 'Left click', label: 'Place door on wall' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.door.toolHints.place' },
+    { key: 'Esc', label: 'nodes.door.toolHints.cancel' },
   ],
 
   presentation: {
-    label: 'Door',
-    description: 'A door cut into a wall. Animated open/close state.',
+    label: 'nodes.door.label',
+    description: 'nodes.door.description',
     icon: { kind: 'url', src: '/icons/door.png' },
     paletteSection: 'structure',
     paletteOrder: 50,

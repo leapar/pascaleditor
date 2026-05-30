@@ -1,0 +1,60 @@
+'use client'
+
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+import { IntlProvider } from 'react-intl'
+import en from './i18n/en.json'
+import zh from './i18n/zh.json'
+
+export type Locale = 'en' | 'zh'
+export const defaultLocale: Locale = 'zh'
+
+const messages: Record<Locale, Record<string, string>> = { en, zh }
+
+interface I18nContextType {
+  locale: Locale
+  setLocale: (locale: Locale) => void
+}
+
+const I18nContext = createContext<I18nContextType>({
+  locale: defaultLocale,
+  setLocale: () => {},
+})
+
+export function useLocale() {
+  return useContext(I18nContext)
+}
+
+export function useTranslations() {
+  const { locale } = useContext(I18nContext)
+  return (key: string, params?: Record<string, string | number>): string => {
+    const str = messages[locale][key] ?? key
+    if (!params) return str
+    return Object.entries(params).reduce(
+      (s, [k, v]) => s.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v)),
+      str,
+    )
+  }
+}
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [locale, setLocale] = useState<Locale>(defaultLocale)
+
+  useEffect(() => {
+    const browserLang = navigator.language.toLowerCase()
+    if (browserLang.startsWith('zh')) {
+      setLocale('zh')
+    } else {
+      setLocale('en')
+    }
+  }, [])
+
+  return (
+    <I18nContext.Provider value={{ locale, setLocale }}>
+      <IntlProvider messages={messages[locale]} locale={locale} defaultLocale="zh">
+        {children}
+      </IntlProvider>
+    </I18nContext.Provider>
+  )
+}
+
+export { messages }

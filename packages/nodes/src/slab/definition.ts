@@ -138,14 +138,14 @@ export const slabDefinition: NodeDefinition<typeof SlabNode> = {
   },
 
   toolHints: [
-    { key: 'Left click', label: 'Trace slab outline' },
-    { key: 'Enter', label: 'Finish slab' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.slab.toolHints.trace' },
+    { key: 'Enter', label: 'nodes.slab.toolHints.finish' },
+    { key: 'Esc', label: 'nodes.slab.toolHints.cancel' },
   ],
 
   presentation: {
-    label: 'Slab',
-    description: 'A polygon-bounded floor surface that hosts items on top.',
+    label: 'nodes.slab.label',
+    description: 'nodes.slab.description',
     icon: { kind: 'url', src: '/icons/floor.png' },
     paletteSection: 'structure',
     paletteOrder: 30,

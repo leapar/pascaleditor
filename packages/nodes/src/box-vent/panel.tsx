@@ -18,6 +18,7 @@ import {
   SliderControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Copy, Move, Trash2 } from 'lucide-react'
@@ -37,6 +38,7 @@ import type { BoxVentNode } from './schema'
  * ghost commits; on Esc it cancels and the original mesh is restored.
  */
 export default function BoxVentPanel() {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const updateNode = useScene((s) => s.updateNode)
@@ -167,7 +169,7 @@ export default function BoxVentPanel() {
       icon="/icons/roof.png"
       onBack={node.roofSegmentId ? handleBack : undefined}
       onClose={handleClose}
-      title={node.name || 'Box Vent'}
+      title={node.name || t('nodes.boxVent.fallbackTitle')}
       width={300}
     >
       <PanelSection title="Style">

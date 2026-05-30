@@ -1,3 +1,5 @@
+'use client'
+
 import {
   type AnyNodeId,
   DoorNode,
@@ -16,6 +18,7 @@ import {
   isValidWallSideFace,
   snapToHalf,
   triggerSFX,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { useEffect, useRef } from 'react'
@@ -35,6 +38,7 @@ const edgeMaterial = new LineBasicNodeMaterial({
  * Doors always sit at floor level (clampedY = height/2).
  */
 const DoorTool: React.FC = () => {
+  const t = useTranslations()
   const draftRef = useRef<DoorNode | null>(null)
   const cursorGroupRef = useRef<Group>(null!)
   const edgesRef = useRef<LineSegments>(null!)
@@ -242,7 +246,7 @@ const DoorTool: React.FC = () => {
         const wall = n.parentId ? state.nodes[n.parentId as AnyNodeId] : undefined
         return wall?.parentId === levelId
       }).length
-      const name = `Door ${doorCount + 1}`
+      const name = t('nodes.door.defaultName', { count: doorCount + 1 })
 
       const node = DoorNode.parse({
         name,

@@ -47,8 +47,8 @@ export const levelDefinition: NodeDefinition<typeof LevelNode> = {
   },
 
   presentation: {
-    label: 'Level',
-    description: 'A single floor of a building, holding walls / slabs / ceilings / items.',
+    label: 'nodes.level.label',
+    description: 'nodes.level.description',
     icon: { kind: 'url', src: '/icons/level.png' },
     paletteSection: 'site',
     paletteOrder: 7,

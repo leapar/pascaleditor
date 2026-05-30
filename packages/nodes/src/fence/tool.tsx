@@ -26,6 +26,7 @@ import {
   snapFenceDraftPoint,
   triggerSFX,
   useEditor,
+  useTranslations,
   WALL_FINE_GRID_STEP,
 } from '@pascal-app/editor'
 import { getSceneTheme, useViewer } from '@pascal-app/viewer'
@@ -119,12 +120,12 @@ function toFencePlanPoint(point: Point2D): FencePlanPoint {
   return [point.x, point.y]
 }
 
-function toMiterWall(segment: SegmentLike): WallNode {
+function toMiterWall(segment: SegmentLike, name: string): WallNode {
   return {
     object: 'node',
     id: segment.id as WallNode['id'],
     type: 'wall',
-    name: 'Fence reference',
+    name,
     parentId: null,
     visible: true,
     metadata: {},
@@ -165,12 +166,13 @@ function getFenceFaceAngleCandidates(
   point: FencePlanPoint,
   segment: SegmentLike,
   miterData: WallMiterData,
+  fenceReferenceName: string,
 ): FaceAngleCandidate[] {
   const endpoint = getSegmentEndpointKind(point, segment)
   const reference = getSegmentAngleReferenceAtPoint(point, segment)
   if (!(endpoint && reference)) return []
 
-  const boundaryPoints = getWallMiterBoundaryPoints(toMiterWall(segment), miterData)
+  const boundaryPoints = getWallMiterBoundaryPoints(toMiterWall(segment, fenceReferenceName), miterData)
   if (!boundaryPoints) return []
 
   const points =
@@ -278,11 +280,12 @@ function getDraftAngleLabels(
   baseY: number,
   previewHeight: number,
   previewThickness: number,
+  fenceReferenceName: string,
 ): DraftAngleLabel[] {
   const draftFromStart: FencePlanPoint = [end[0] - start[0], end[1] - start[1]]
   const draftFromEnd: FencePlanPoint = [start[0] - end[0], start[1] - end[1]]
   const draftSegment = buildDraftFenceSegment(start, end, previewThickness)
-  const miterData = calculateLevelMiters([...segments, draftSegment].map(toMiterWall))
+  const miterData = calculateLevelMiters([...segments, draftSegment].map((s) => toMiterWall(s, fenceReferenceName)))
   const endpoints = [
     { id: 'start', point: start, draftVector: draftFromStart },
     { id: 'end', point: end, draftVector: draftFromEnd },
@@ -295,11 +298,12 @@ function getDraftAngleLabels(
     if (!connectedSegment) continue
     const connectedReference = getSegmentAngleReferenceAtPoint(endpoint.point, connectedSegment)
     if (!connectedReference) continue
-    const draftFaceCandidates = getFenceFaceAngleCandidates(endpoint.point, draftSegment, miterData)
+    const draftFaceCandidates = getFenceFaceAngleCandidates(endpoint.point, draftSegment, miterData, fenceReferenceName)
     const connectedFaceCandidates = getFenceFaceAngleCandidates(
       endpoint.point,
       connectedSegment,
       miterData,
+      fenceReferenceName,
     )
     const facePairs = getMatchingFaceAnglePairs(draftFaceCandidates, connectedFaceCandidates)
     const { arcCenter, connectedVector, draftVector } = getAngleSource(
@@ -354,6 +358,7 @@ function getDraftMeasurementState(
   baseY: number,
   previewHeight: number,
   previewThickness: number,
+  fenceReferenceName: string,
 ): DraftMeasurementState {
   const dx = end[0] - start[0]
   const dz = end[1] - start[1]
@@ -366,7 +371,7 @@ function getDraftMeasurementState(
       baseY + previewHeight + DRAFT_LABEL_Y_OFFSET,
       (start[1] + end[1]) / 2,
     ],
-    angleLabels: getDraftAngleLabels(start, end, segments, baseY, previewHeight, previewThickness),
+    angleLabels: getDraftAngleLabels(start, end, segments, baseY, previewHeight, previewThickness, fenceReferenceName),
   }
 }
 
@@ -430,6 +435,7 @@ function getCurrentLevelElements(): { walls: WallNode[]; fences: FenceNode[] } {
 }
 
 export const FenceTool: React.FC = () => {
+  const t = useTranslations()
   const unit = useViewer((state) => state.unit)
   const isDark = useViewer((state) => getSceneTheme(state.sceneTheme).appearance === 'dark')
   // A placed preset seeds `toolDefaults.fence` before the tool mounts, so
@@ -510,6 +516,7 @@ export const FenceTool: React.FC = () => {
             startingPoint.current.y,
             previewHeightRef.current,
             previewThicknessRef.current,
+            t('nodes.fence.reference'),
           ),
         )
       } else {

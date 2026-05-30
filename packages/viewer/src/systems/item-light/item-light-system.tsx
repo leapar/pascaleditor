@@ -1,3 +1,5 @@
+'use client'
+
 import type { AnyNodeId, LevelNode } from '@pascal-app/core'
 import { sceneRegistry, useInteractive, useScene } from '@pascal-app/core'
 import { useFrame } from '@react-three/fiber'

@@ -1,40 +1,59 @@
 import type { AnyNode } from '@pascal-app/core'
+import { messages } from '../../../lib/i18n'
 
 export type NodeDisplay = {
   icon: string
-  label: string
+  /** i18n key or custom name */
+  labelKey: string
 }
 
 const TYPE_DEFAULTS: Record<string, NodeDisplay> = {
-  item: { icon: '/icons/furniture.png', label: 'Item' },
-  wall: { icon: '/icons/wall.png', label: 'Wall' },
-  door: { icon: '/icons/door.png', label: 'Door' },
-  window: { icon: '/icons/window.png', label: 'Window' },
-  slab: { icon: '/icons/floor.png', label: 'Slab' },
-  ceiling: { icon: '/icons/ceiling.png', label: 'Ceiling' },
-  column: { icon: '/icons/column.png', label: 'Column' },
-  elevator: { icon: '/icons/elevator.png', label: 'Elevator' },
-  fence: { icon: '/icons/fence.png', label: 'Fence' },
-  roof: { icon: '/icons/roof.png', label: 'Roof' },
-  'roof-segment': { icon: '/icons/roof.png', label: 'Roof segment' },
-  stair: { icon: '/icons/stair.png', label: 'Stair' },
-  'stair-segment': { icon: '/icons/stair.png', label: 'Stair segment' },
-  scan: { icon: '/icons/mesh.png', label: '3D Scan' },
-  guide: { icon: '/icons/floorplan.png', label: 'Guide image' },
+  item: { icon: '/icons/furniture.png', labelKey: 'nodeTypes.item' },
+  wall: { icon: '/icons/wall.png', labelKey: 'nodeTypes.wall' },
+  door: { icon: '/icons/door.png', labelKey: 'nodeTypes.door' },
+  window: { icon: '/icons/window.png', labelKey: 'nodeTypes.window' },
+  slab: { icon: '/icons/floor.png', labelKey: 'nodeTypes.slab' },
+  ceiling: { icon: '/icons/ceiling.png', labelKey: 'nodeTypes.ceiling' },
+  column: { icon: '/icons/column.png', labelKey: 'nodeTypes.column' },
+  elevator: { icon: '/icons/elevator.png', labelKey: 'nodeTypes.elevator' },
+  fence: { icon: '/icons/fence.png', labelKey: 'nodeTypes.fence' },
+  roof: { icon: '/icons/roof.png', labelKey: 'nodeTypes.roof' },
+  'roof-segment': { icon: '/icons/roof.png', labelKey: 'nodeTypes.roofSegment' },
+  stair: { icon: '/icons/stair.png', labelKey: 'nodeTypes.stairs' },
+  'stair-segment': { icon: '/icons/stair.png', labelKey: 'nodeTypes.stairSegment' },
+  scan: { icon: '/icons/mesh.png', labelKey: 'nodeTypes.scan' },
+  guide: { icon: '/icons/floorplan.png', labelKey: 'nodeTypes.guide' },
+  shelf: { icon: '/icons/shelf.png', labelKey: 'nodeTypes.shelf' },
+  spawn: { icon: '/icons/site.png', labelKey: 'nodeTypes.spawn' },
+  boxVent: { icon: '/icons/box-vent.png', labelKey: 'nodeTypes.boxVent' },
+  chimney: { icon: '/icons/chimney.png', labelKey: 'nodeTypes.chimney' },
+  dormer: { icon: '/icons/dormer.png', labelKey: 'nodeTypes.dormer' },
+  ridgeVent: { icon: '/icons/ridge-vent.png', labelKey: 'nodeTypes.ridgeVent' },
+  solarPanel: { icon: '/icons/solar-panel.png', labelKey: 'nodeTypes.solarPanel' },
 }
 
+/**
+ * Returns display info for a node.
+ * labelKey is either an i18n key (nodeTypes.XXX) or a custom name set by the user.
+ */
 export function getNodeDisplay(node: AnyNode | null | undefined): NodeDisplay {
-  if (!node) return { icon: '/icons/select.png', label: 'Selection' }
-  const fallback = TYPE_DEFAULTS[node.type] ?? { icon: '/icons/select.png', label: node.type }
+  if (!node) return { icon: '/icons/select.png', labelKey: 'Selection' }
+  const fallback = TYPE_DEFAULTS[node.type] ?? { icon: '/icons/select.png', labelKey: node.type }
   // Item nodes carry an asset with its own thumbnail/name
   if (node.type === 'item') {
+    const name = node.name || node.asset?.name
     return {
       icon: node.asset?.thumbnail || fallback.icon,
-      label: node.name || node.asset?.name || fallback.label,
+      labelKey: name || fallback.labelKey,
     }
   }
   return {
     icon: fallback.icon,
-    label: node.name || fallback.label,
+    labelKey: node.name || fallback.labelKey,
   }
+}
+
+/** Resolve a node type label key to a translated string */
+export function resolveNodeLabel(labelKey: string, locale: string): string {
+  return (messages[locale as 'en' | 'zh'] as Record<string, string>)[labelKey] || labelKey
 }

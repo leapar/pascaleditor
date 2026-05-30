@@ -56,7 +56,7 @@ export const zoneDefinition: NodeDefinition<typeof ZoneNode> = {
   },
 
   presentation: {
-    label: 'Zone',
+    label: 'nodes.zone.label',
     description: 'A polygonal site zone (lawn, water, paving) with a TSL gradient material.',
     icon: { kind: 'url', src: '/icons/zone.png' },
     paletteSection: 'site',

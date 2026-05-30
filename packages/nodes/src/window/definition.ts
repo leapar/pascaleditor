@@ -176,13 +176,13 @@ export const windowDefinition: NodeDefinition<typeof WindowNode> = {
   },
 
   toolHints: [
-    { key: 'Left click', label: 'Place window on wall' },
-    { key: 'Esc', label: 'Cancel' },
+    { key: 'Left click', label: 'nodes.window.toolHints.place' },
+    { key: 'Esc', label: 'nodes.window.toolHints.cancel' },
   ],
 
   presentation: {
-    label: 'Window',
-    description: 'A window cut into a wall. Animated open/close for opening windows.',
+    label: 'nodes.window.label',
+    description: 'nodes.window.description',
     icon: { kind: 'url', src: '/icons/window.png' },
     paletteSection: 'structure',
     paletteOrder: 60,

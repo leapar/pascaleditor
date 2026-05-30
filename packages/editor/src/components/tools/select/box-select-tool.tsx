@@ -1,3 +1,5 @@
+'use client'
+
 import '../../../three-types'
 
 import { Icon } from '@iconify/react'

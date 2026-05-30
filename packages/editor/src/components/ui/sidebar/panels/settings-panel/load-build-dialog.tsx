@@ -1,3 +1,5 @@
+'use client'
+
 import type { BuildStats, SchemaIssue, ValidateBuildJsonResult } from '@pascal-app/core'
 import {
   AlertTriangle,
@@ -22,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../../../../components/ui/primitives/dialog'
+import { messages, useLocale } from '../../../../../lib/i18n'
 
 export type PendingImport = {
   fileName: string
@@ -37,24 +40,24 @@ type Props = {
 
 type StatRow = {
   icon: typeof Building2
-  label: string
+  labelKey: string
   count: number
 }
 
-function statsRows(stats: BuildStats): StatRow[] {
+function statsRows(stats: BuildStats, t: (key: string) => string): StatRow[] {
   return (
     [
-      { icon: MapPin, label: 'Sites', count: stats.byType.site ?? 0 },
-      { icon: Building2, label: 'Buildings', count: stats.byType.building ?? 0 },
-      { icon: Layers, label: 'Levels', count: stats.byType.level ?? 0 },
-      { icon: Square, label: 'Walls', count: stats.byType.wall ?? 0 },
-      { icon: DoorOpen, label: 'Doors', count: stats.byType.door ?? 0 },
-      { icon: AppWindow, label: 'Windows', count: stats.byType.window ?? 0 },
-      { icon: Box, label: 'Items', count: stats.byType.item ?? 0 },
-      { icon: Square, label: 'Slabs', count: stats.byType.slab ?? 0 },
-      { icon: Square, label: 'Ceilings', count: stats.byType.ceiling ?? 0 },
-      { icon: Square, label: 'Zones', count: stats.byType.zone ?? 0 },
-      { icon: Scan, label: 'Scans', count: stats.byType.scan ?? 0 },
+      { icon: MapPin, labelKey: 'loadBuild.sites', count: stats.byType.site ?? 0 },
+      { icon: Building2, labelKey: 'loadBuild.buildings', count: stats.byType.building ?? 0 },
+      { icon: Layers, labelKey: 'loadBuild.levels', count: stats.byType.level ?? 0 },
+      { icon: Square, labelKey: 'loadBuild.walls', count: stats.byType.wall ?? 0 },
+      { icon: DoorOpen, labelKey: 'loadBuild.doors', count: stats.byType.door ?? 0 },
+      { icon: AppWindow, labelKey: 'loadBuild.windows', count: stats.byType.window ?? 0 },
+      { icon: Box, labelKey: 'loadBuild.items', count: stats.byType.item ?? 0 },
+      { icon: Square, labelKey: 'loadBuild.slabs', count: stats.byType.slab ?? 0 },
+      { icon: Square, labelKey: 'loadBuild.ceilings', count: stats.byType.ceiling ?? 0 },
+      { icon: Square, labelKey: 'loadBuild.zones', count: stats.byType.zone ?? 0 },
+      { icon: Scan, labelKey: 'loadBuild.scans', count: stats.byType.scan ?? 0 },
     ] satisfies StatRow[]
   ).filter((row) => row.count > 0)
 }
@@ -87,6 +90,8 @@ function formatFloorArea(m2: number): string {
 }
 
 export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale as 'en' | 'zh'] as Record<string, string>)[key] || key
   const [showAllWarnings, setShowAllWarnings] = useState(false)
   const [showSchemaIssues, setShowSchemaIssues] = useState(false)
 
@@ -94,7 +99,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
 
   const { fileName, fileSizeBytes, result } = pending
   const { ok, parsed, stats, errors, warnings, schemaIssues, schemaIssueCount } = result
-  const rows = statsRows(stats)
+  const rows = statsRows(stats, t)
   const visibleWarnings = showAllWarnings ? warnings : warnings.slice(0, 3)
   const hiddenWarningCount = warnings.length - visibleWarnings.length
   const schemaIssuesByType = groupSchemaIssuesByType(schemaIssues)
@@ -114,7 +119,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
             ) : (
               <XCircle className="size-5 text-red-600" />
             )}
-            {ok ? 'Ready to import' : 'Cannot import this file'}
+            {ok ? t('loadBuild.readyToImport') : t('loadBuild.cannotImport')}
           </DialogTitle>
           <DialogDescription>
             {fileName} · {formatFileSize(fileSizeBytes)} · {stats.total} node
@@ -127,7 +132,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
             <div className="space-y-2 rounded-md border border-red-200 bg-red-50 p-3">
               <div className="flex items-center gap-2 font-medium text-red-800 text-sm">
                 <XCircle className="size-4" />
-                {errors.length} error{errors.length === 1 ? '' : 's'}
+                {t('loadBuild.errors').replace('{count}', String(errors.length))}
               </div>
               <ul className="space-y-1 text-red-700 text-xs">
                 {errors.map((e) => (
@@ -140,7 +145,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
           {stats.total > 0 && (
             <div className="rounded-md border bg-card">
               <div className="border-b px-3 py-2 font-medium text-muted-foreground text-xs uppercase">
-                Structure
+                {t('loadBuild.structure')}
               </div>
               {rows.length > 0 ? (
                 <div>
@@ -151,11 +156,11 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
                         className={`flex items-center justify-between px-3 py-2 ${
                           i === rows.length - 1 ? '' : 'border-b'
                         }`}
-                        key={row.label}
+                        key={row.labelKey}
                       >
                         <div className="flex items-center gap-2">
                           <Icon className="size-4 text-muted-foreground" />
-                          <span className="text-sm">{row.label}</span>
+                          <span className="text-sm">{t(row.labelKey)}</span>
                         </div>
                         <span className="font-medium text-sm">{row.count}</span>
                       </div>
@@ -163,7 +168,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
                   })}
                   {stats.floorAreaM2 > 0 && (
                     <div className="flex items-center justify-between border-t px-3 py-2">
-                      <span className="text-muted-foreground text-sm">Floor area</span>
+                      <span className="text-muted-foreground text-sm">{t('loadBuild.floorArea')}</span>
                       <span className="font-medium text-sm">
                         {formatFloorArea(stats.floorAreaM2)}
                       </span>
@@ -172,7 +177,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
                 </div>
               ) : (
                 <div className="px-3 py-4 text-center text-muted-foreground text-xs">
-                  The file contains no recognised nodes.
+                  {t('loadBuild.noRecognisedNodes')}
                 </div>
               )}
             </div>
@@ -182,7 +187,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
             <div className="space-y-2 rounded-md border border-amber-200 bg-amber-50 p-3">
               <div className="flex items-center gap-2 font-medium text-amber-800 text-sm">
                 <AlertTriangle className="size-4" />
-                {warnings.length} warning{warnings.length === 1 ? '' : 's'}
+                {t('loadBuild.warnings').replace('{count}', String(warnings.length))}
               </div>
               <ul className="space-y-1 text-amber-700 text-xs">
                 {visibleWarnings.map((w, i) => (
@@ -195,7 +200,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
                   onClick={() => setShowAllWarnings(true)}
                   type="button"
                 >
-                  Show {hiddenWarningCount} more
+                  {t('loadBuild.showMore').replace('{count}', String(hiddenWarningCount))}
                 </button>
               )}
             </div>
@@ -209,11 +214,10 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
                 type="button"
               >
                 <span className="font-medium text-muted-foreground text-xs uppercase">
-                  Schema details ({schemaIssueCount} node
-                  {schemaIssueCount === 1 ? '' : 's'})
+                  {t('loadBuild.schemaDetails').replace('{count}', String(schemaIssueCount))}
                 </span>
                 <span className="text-muted-foreground text-xs">
-                  {showSchemaIssues ? 'Hide' : 'Show'}
+                  {showSchemaIssues ? t('loadBuild.hide') : t('loadBuild.showMore').replace('{count}', String(schemaIssueCount))}
                 </span>
               </button>
               {showSchemaIssues && (
@@ -242,7 +246,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
 
         <DialogFooter>
           <Button onClick={onCancel} variant="outline">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             disabled={!ok || !parsed}
@@ -250,7 +254,7 @@ export function LoadBuildDialog({ pending, onCancel, onConfirm }: Props) {
               if (parsed) onConfirm(parsed)
             }}
           >
-            Replace current scene
+            {t('loadBuild.replaceScene')}
           </Button>
         </DialogFooter>
       </DialogContent>

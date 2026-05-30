@@ -19,6 +19,7 @@ import {
   SegmentedControl,
   SliderControl,
   triggerSFX,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { LayoutGrid, Trash2 } from 'lucide-react'
@@ -56,6 +57,7 @@ function num(value: unknown, fallback: number): number {
 }
 
 export default function SolarPanelPanel() {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const updateNode = useScene((s) => s.updateNode)
@@ -184,7 +186,7 @@ export default function SolarPanelPanel() {
       icon="/icons/roof.png"
       onBack={node.roofSegmentId ? handleBack : undefined}
       onClose={handleClose}
-      title={node.name || 'Solar Panel'}
+      title={node.name || t('nodes.solarPanel.fallbackTitle')}
       width={300}
     >
       <PanelSection title="Preset">

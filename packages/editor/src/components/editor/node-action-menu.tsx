@@ -3,6 +3,7 @@
 import { Icon } from '@iconify/react'
 import { Copy, Move, Spline, Trash2 } from 'lucide-react'
 import type { MouseEventHandler, PointerEventHandler } from 'react'
+import { messages, useLocale } from '../../lib/i18n'
 
 type NodeActionMenuProps = {
   onAddHole?: MouseEventHandler<HTMLButtonElement>
@@ -27,6 +28,9 @@ export function NodeActionMenu({
   onPointerEnter,
   onPointerLeave,
 }: NodeActionMenuProps) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
+
   return (
     <div
       className="pointer-events-auto flex items-center gap-1 rounded-lg border border-border bg-background/95 p-1 shadow-xl backdrop-blur-md"
@@ -37,10 +41,10 @@ export function NodeActionMenu({
     >
       {onMove && (
         <button
-          aria-label="Move"
+          aria-label={t('nodeActions.move')}
           className="tooltip-trigger rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={onMove}
-          title="Move"
+          title={t('nodeActions.move')}
           type="button"
         >
           <Move className="h-4 w-4" />
@@ -48,10 +52,10 @@ export function NodeActionMenu({
       )}
       {onCurve && (
         <button
-          aria-label="Curve"
+          aria-label={t('nodeActions.curve')}
           className="tooltip-trigger rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={onCurve}
-          title="Curve"
+          title={t('nodeActions.curve')}
           type="button"
         >
           <Spline className="h-4 w-4" />
@@ -59,10 +63,10 @@ export function NodeActionMenu({
       )}
       {onDuplicate && (
         <button
-          aria-label="Duplicate"
+          aria-label={t('nodeActions.duplicate')}
           className="tooltip-trigger rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={onDuplicate}
-          title="Duplicate"
+          title={t('nodeActions.duplicate')}
           type="button"
         >
           <Copy className="h-4 w-4" />
@@ -70,10 +74,10 @@ export function NodeActionMenu({
       )}
       {onAddHole && (
         <button
-          aria-label="Cut Out"
+          aria-label={t('nodeActions.cutOut')}
           className="tooltip-trigger rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={onAddHole}
-          title="Cut Out"
+          title={t('nodeActions.cutOut')}
           type="button"
         >
           <Icon height={16} icon="carbon:cut-out" width={16} />
@@ -81,10 +85,10 @@ export function NodeActionMenu({
       )}
       {onDelete && (
         <button
-          aria-label="Delete"
+          aria-label={t('nodeActions.delete')}
           className="tooltip-trigger rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
           onClick={onDelete}
-          title="Delete"
+          title={t('nodeActions.delete')}
           type="button"
         >
           <Trash2 className="h-4 w-4" />

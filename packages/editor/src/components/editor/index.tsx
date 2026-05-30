@@ -28,6 +28,7 @@ import {
   writePersistedSelection,
 } from '../../lib/scene'
 import { initSFXBus } from '../../lib/sfx-bus'
+import { messages, useLocale } from '../../lib/i18n'
 import useEditor from '../../store/use-editor'
 import { CeilingSelectionAffordanceSystem } from '../systems/ceiling/ceiling-selection-affordance-system'
 import { CeilingSystem } from '../systems/ceiling/ceiling-system'
@@ -328,46 +329,46 @@ type ShortcutKey = {
 }
 
 type CameraControlHint = {
-  action: string
+  actionKey: string
   keys: ShortcutKey[]
   alternativeKeys?: ShortcutKey[]
 }
 
 const EDITOR_CAMERA_CONTROL_HINTS: CameraControlHint[] = [
   {
-    action: 'Pan',
+    actionKey: 'editor.cameraPan',
     keys: [{ value: 'Space' }, { value: 'Left click' }],
   },
-  { action: 'Rotate', keys: [{ value: 'Right click' }] },
-  { action: 'Zoom', keys: [{ value: 'Scroll' }] },
+  { actionKey: 'editor.cameraRotate', keys: [{ value: 'Right click' }] },
+  { actionKey: 'editor.cameraZoom', keys: [{ value: 'Scroll' }] },
 ]
 
 const PREVIEW_CAMERA_CONTROL_HINTS: CameraControlHint[] = [
-  { action: 'Pan', keys: [{ value: 'Left click' }] },
-  { action: 'Rotate', keys: [{ value: 'Right click' }] },
-  { action: 'Zoom', keys: [{ value: 'Scroll' }] },
+  { actionKey: 'editor.cameraPan', keys: [{ value: 'Left click' }] },
+  { actionKey: 'editor.cameraRotate', keys: [{ value: 'Right click' }] },
+  { actionKey: 'editor.cameraZoom', keys: [{ value: 'Scroll' }] },
 ]
 
-const CAMERA_SHORTCUT_KEY_META: Record<string, { icon?: string; label: string; text?: string }> = {
+const CAMERA_SHORTCUT_KEY_META: Record<string, { icon?: string; labelKey: string }> = {
   'Left click': {
     icon: 'ph:mouse-left-click-fill',
-    label: 'Left click',
+    labelKey: 'editor.leftClick',
   },
   'Middle click': {
     icon: 'qlementine-icons:mouse-middle-button-16',
-    label: 'Middle click',
+    labelKey: 'editor.middleClick',
   },
   'Right click': {
     icon: 'ph:mouse-right-click-fill',
-    label: 'Right click',
+    labelKey: 'editor.rightClick',
   },
   Scroll: {
     icon: 'qlementine-icons:mouse-middle-button-16',
-    label: 'Scroll wheel',
+    labelKey: 'editor.scrollWheel',
   },
   Space: {
     icon: 'lucide:space',
-    label: 'Space',
+    labelKey: 'editor.space',
   },
 }
 
@@ -398,55 +399,55 @@ function writeCameraControlsHintDismissed(dismissed: boolean) {
   } catch {}
 }
 
-function InlineShortcutKey({ shortcutKey }: { shortcutKey: ShortcutKey }) {
+function InlineShortcutKey({ shortcutKey, t }: { shortcutKey: ShortcutKey; t: (key: string) => string }) {
   const meta = CAMERA_SHORTCUT_KEY_META[shortcutKey.value]
 
   if (meta?.icon) {
     return (
       <span
-        aria-label={meta.label}
+        aria-label={t(meta.labelKey)}
         className="inline-flex items-center text-foreground/90"
         role="img"
-        title={meta.label}
+        title={t(meta.labelKey)}
       >
         <Icon aria-hidden="true" color="currentColor" height={16} icon={meta.icon} width={16} />
-        <span className="sr-only">{meta.label}</span>
+        <span className="sr-only">{t(meta.labelKey)}</span>
       </span>
     )
   }
 
   return (
     <span className="font-medium text-[11px] text-foreground/90">
-      {meta?.text ?? shortcutKey.value}
+      {shortcutKey.value}
     </span>
   )
 }
 
-function ShortcutSequence({ keys }: { keys: ShortcutKey[] }) {
+function ShortcutSequence({ keys, t }: { keys: ShortcutKey[]; t: (key: string) => string }) {
   return (
     <div className="flex flex-wrap items-center gap-1">
       {keys.map((key, index) => (
         <div className="flex items-center gap-1" key={`${key.value}-${index}`}>
           {index > 0 ? <span className="text-[10px] text-muted-foreground/70">+</span> : null}
-          <InlineShortcutKey shortcutKey={key} />
+          <InlineShortcutKey shortcutKey={key} t={t} />
         </div>
       ))}
     </div>
   )
 }
 
-function CameraControlHintItem({ hint }: { hint: CameraControlHint }) {
+function CameraControlHintItem({ hint, t }: { hint: CameraControlHint; t: (key: string) => string }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-1.5 px-4 text-center first:pl-0 last:pr-0">
       <span className="font-medium text-[10px] text-muted-foreground/60 tracking-[0.03em]">
-        {hint.action}
+        {t(hint.actionKey)}
       </span>
       <div className="flex flex-wrap items-center justify-center gap-1.5">
-        <ShortcutSequence keys={hint.keys} />
+        <ShortcutSequence keys={hint.keys} t={t} />
         {hint.alternativeKeys ? (
           <>
             <span className="text-[10px] text-muted-foreground/40">/</span>
-            <ShortcutSequence keys={hint.alternativeKeys} />
+            <ShortcutSequence keys={hint.alternativeKeys} t={t} />
           </>
         ) : null}
       </div>
@@ -457,9 +458,11 @@ function CameraControlHintItem({ hint }: { hint: CameraControlHint }) {
 function ViewerCanvasControlsHint({
   isPreviewMode,
   onDismiss,
+  t,
 }: {
   isPreviewMode: boolean
   onDismiss: () => void
+  t: (key: string) => string
 }) {
   const hints = isPreviewMode ? PREVIEW_CAMERA_CONTROL_HINTS : EDITOR_CAMERA_CONTROL_HINTS
 
@@ -471,7 +474,7 @@ function ViewerCanvasControlsHint({
       >
         <div className="grid min-w-0 flex-1 grid-cols-3 items-start divide-x divide-border/18">
           {hints.map((hint) => (
-            <CameraControlHintItem hint={hint} key={hint.action} />
+            <CameraControlHintItem hint={hint} key={hint.actionKey} t={t} />
           ))}
         </div>
         <Tooltip>
@@ -492,7 +495,7 @@ function ViewerCanvasControlsHint({
             </button>
           </TooltipTrigger>
           <TooltipContent side="bottom" sideOffset={8}>
-            Dismiss
+            {t('editor.dismiss')}
           </TooltipContent>
         </Tooltip>
       </section>
@@ -810,6 +813,9 @@ const ViewerCanvas = memo(function ViewerCanvas({
   showLoader: boolean
   onThumbnailCapture?: (blob: Blob, cameraData: SnapshotCameraData) => void
 }) {
+  const { locale } = useLocale()
+  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
+
   const viewMode = useEditor((s) => s.viewMode)
   const floorplanPaneRatio = useEditor((s) => s.floorplanPaneRatio)
   const setFloorplanPaneRatio = useEditor((s) => s.setFloorplanPaneRatio)
@@ -905,6 +911,7 @@ const ViewerCanvas = memo(function ViewerCanvas({
             <ViewerCanvasControlsHint
               isPreviewMode={isPreviewMode}
               onDismiss={dismissCameraControlsHint}
+              t={t}
             />
           ) : null}
           <SelectionPersistenceManager enabled={hasLoadedInitialScene && !showLoader} />
