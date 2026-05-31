@@ -71,6 +71,7 @@ import {
 import { guideEmitter } from '../../lib/guide-events'
 import { sfxEmitter } from '../../lib/sfx-bus'
 import { cn } from '../../lib/utils'
+import { useTranslations } from '../../lib/i18n'
 import type { GuideUiState } from '../../store/use-editor'
 import useEditor from '../../store/use-editor'
 import { FloorplanCursorIndicatorOverlay as Editor2dFloorplanCursorIndicatorOverlay } from '../editor-2d/floorplan-cursor-indicator-overlay'
@@ -4043,6 +4044,7 @@ const FloorplanPolygonHandleLayer = memo(function FloorplanPolygonHandleLayer({
 })
 
 export function FloorplanPanel() {
+  const t = useTranslations()
   const viewportHostRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const floorplanSceneRef = useRef<SVGGElement>(null)
@@ -8637,7 +8639,7 @@ export function FloorplanPanel() {
                 <Ruler className="h-4 w-4 text-foreground/80" />
               </div>
               <div className="min-w-0">
-                <div className="font-medium text-sm">Set overlay scale</div>
+                <div className="font-medium text-sm">{t('editor.setOverlayScale')}</div>
                 <div className="mt-0.5 text-muted-foreground text-xs leading-4">
                   Enter the real-world length of the line you just drew. The image will resize to
                   match it.

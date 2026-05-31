@@ -19,7 +19,7 @@ import {
   useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { DormerActionsSection } from './panel-actions-section'
 import { DormerPositionSection } from './panel-position-section'
 import { DormerWindowSection } from './panel-window-section'
@@ -28,23 +28,33 @@ type RoofType = DormerNode['roofType']
 type DormerSection = 'dormer' | 'window'
 
 const ROOF_TYPE_OPTIONS: Array<{ label: string; value: RoofType }> = [
-  { label: 'Gable', value: 'gable' },
-  { label: 'Hip', value: 'hip' },
-  { label: 'Shed', value: 'shed' },
-  { label: 'Gambrel', value: 'gambrel' },
-  { label: 'Dutch', value: 'dutch' },
-  { label: 'Mansard', value: 'mansard' },
-  { label: 'Flat', value: 'flat' },
+  { label: 'nodes.dormer.gable', value: 'gable' },
+  { label: 'nodes.dormer.hip', value: 'hip' },
+  { label: 'nodes.dormer.shed', value: 'shed' },
+  { label: 'nodes.dormer.gambrel', value: 'gambrel' },
+  { label: 'nodes.dormer.dutch', value: 'dutch' },
+  { label: 'nodes.dormer.mansard', value: 'mansard' },
+  { label: 'nodes.dormer.flat', value: 'flat' },
 ]
 
 const SECTION_OPTIONS: Array<{ label: string; value: DormerSection }> = [
-  { label: 'Dormer', value: 'dormer' },
-  { label: 'Window', value: 'window' },
+  { label: 'nodes.dormer.dormer', value: 'dormer' },
+  { label: 'nodes.dormer.window', value: 'window' },
 ]
 
 export default function DormerPanel() {
   const t = useTranslations()
   const [section, setSection] = useState<DormerSection>('dormer')
+
+  const resolvedSectionOptions = useMemo(
+    () => SECTION_OPTIONS.map((o) => ({ ...o, label: t(o.label) })),
+    [t],
+  )
+
+  const resolvedRoofTypeOptions = useMemo(
+    () => ROOF_TYPE_OPTIONS.map((o) => ({ ...o, label: t(o.label) })),
+    [t],
+  )
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const updateNode = useScene((s) => s.updateNode)
@@ -178,7 +188,7 @@ export default function DormerPanel() {
 
       <PanelSection title={t('nodes.dormer.section')}>
         <div className="grid grid-cols-3 gap-1.5 px-1 pt-1">
-          {SECTION_OPTIONS.map((option) => {
+          {resolvedSectionOptions.map((option) => {
             const isSelected = section === option.value
             return (
               <button
@@ -254,7 +264,7 @@ export default function DormerPanel() {
 
           <PanelSection title={t('nodes.dormer.section')}>
             <div className="grid grid-cols-3 gap-1.5 px-1 pt-1">
-              {ROOF_TYPE_OPTIONS.map((option) => {
+              {resolvedRoofTypeOptions.map((option) => {
                 const isSelected = node.roofType === option.value
                 return (
                   <button

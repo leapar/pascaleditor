@@ -12,6 +12,7 @@ import { type AnyNode, type LevelNode, useScene } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { Box, Grid2x2, Layers, Layers2, Maximize, ScanLine, Square } from 'lucide-react'
 import { type ReactNode, useMemo } from 'react'
+import { useTranslations } from '../../packages/editor/src/lib/i18n'
 
 const levelModes = ['stacked', 'solo', 'exploded', 'manual'] as const
 const wallModes = ['up', 'cutaway', 'down'] as const
@@ -63,6 +64,7 @@ function ToolButton({
 }
 
 export function PreviewToolbar() {
+  const t = useTranslations()
   const cameraMode = useViewer((s) => s.cameraMode)
   const setCameraMode = useViewer((s) => s.setCameraMode)
   const showGrid = useViewer((s) => s.showGrid)
@@ -110,7 +112,7 @@ export function PreviewToolbar() {
       <ToolButton
         active={showGrid}
         icon={<Grid2x2 className="size-3.5" />}
-        label="Grid"
+        label={t('editor.grid')}
         onClick={() => setShowGrid(!showGrid)}
       />
     </div>
@@ -122,7 +124,7 @@ export function FitSceneButton({ onFit }: { onFit: () => void }) {
     <button
       className="flex h-8 items-center gap-1.5 rounded-xl border border-white/10 bg-black/60 px-3 font-medium text-white/85 text-xs shadow-lg backdrop-blur-md transition-colors hover:bg-black/70 hover:text-white"
       onClick={onFit}
-      title="Fit scene"
+      title={t('editor.fitScene')}
       type="button"
     >
       <Maximize className="size-3.5" />

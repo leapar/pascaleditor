@@ -28,7 +28,7 @@ import {
   writePersistedSelection,
 } from '../../lib/scene'
 import { initSFXBus } from '../../lib/sfx-bus'
-import { messages, useLocale } from '../../lib/i18n'
+import { messages, useLocale, useTranslations } from '../../lib/i18n'
 import useEditor from '../../store/use-editor'
 import { CeilingSelectionAffordanceSystem } from '../systems/ceiling/ceiling-selection-affordance-system'
 import { CeilingSystem } from '../systems/ceiling/ceiling-system'
@@ -165,10 +165,11 @@ export interface EditorProps {
 }
 
 function EditorSceneCrashFallback() {
+  const t = useTranslations()
   return (
     <div className="fixed inset-0 z-80 flex items-center justify-center bg-background/95 p-4 text-foreground">
       <div className="w-full max-w-md rounded-2xl border border-border/60 bg-background p-6 shadow-xl">
-        <h2 className="font-semibold text-lg">The editor scene failed to render</h2>
+        <h2 className="font-semibold text-lg">{t('editor.sceneFailedToRender')}</h2>
         <p className="mt-2 text-muted-foreground text-sm">
           You can retry the scene or return home without reloading the whole app shell.
         </p>
@@ -178,7 +179,7 @@ function EditorSceneCrashFallback() {
             onClick={() => window.location.reload()}
             type="button"
           >
-            Reload editor
+            {t('editor.reloadEditor')}
           </button>
           <a
             className="rounded-md border border-border bg-background px-3 py-2 font-medium text-sm hover:bg-accent/40"
@@ -195,6 +196,7 @@ function EditorSceneCrashFallback() {
 // ── Sidebar slot: in-flow, resizable, collapses to a grab strip ──────────────
 
 function SidebarSlot({ children }: { children: ReactNode }) {
+  const t = useTranslations()
   const width = useSidebarStore((s) => s.width)
   const isCollapsed = useSidebarStore((s) => s.isCollapsed)
   const setIsCollapsed = useSidebarStore((s) => s.setIsCollapsed)
@@ -266,7 +268,7 @@ function SidebarSlot({ children }: { children: ReactNode }) {
           <div
             className="absolute inset-0 z-10 cursor-col-resize transition-colors hover:bg-primary/20"
             onPointerDown={handleGrabDown}
-            title="Expand sidebar"
+            title={t('editor.expandSidebar')}
           />
         ) : (
           children
@@ -469,7 +471,7 @@ function ViewerCanvasControlsHint({
   return (
     <div className="pointer-events-none absolute top-14 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2">
       <section
-        aria-label="Camera controls hint"
+        aria-label={t('editor.cameraControlsHint')}
         className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-border/35 bg-background/90 px-3.5 py-2.5 shadow-elevation-4 backdrop-blur-xl"
       >
         <div className="grid min-w-0 flex-1 grid-cols-3 items-start divide-x divide-border/18">
@@ -480,7 +482,7 @@ function ViewerCanvasControlsHint({
         <Tooltip>
           <TooltipTrigger asChild>
             <button
-              aria-label="Dismiss camera controls hint"
+              aria-label={t('editor.dismissCameraControlsHint')}
               className="flex h-5 shrink-0 items-center justify-center self-center border-border/18 border-l pl-3 text-muted-foreground/70 transition-colors hover:text-foreground"
               onClick={onDismiss}
               type="button"

@@ -253,7 +253,7 @@ export default function RoofPanel() {
 
       <PanelSection title={t('common.position')}>
         <SliderControl
-          label="X"
+          label={t('common.x')}
           max={50}
           min={-50}
           onChange={(v) => {
@@ -267,7 +267,7 @@ export default function RoofPanel() {
           value={Math.round(node.position[0] * 100) / 100}
         />
         <SliderControl
-          label="Y"
+          label={t('common.y')}
           max={50}
           min={-50}
           onChange={(v) => {
@@ -281,7 +281,7 @@ export default function RoofPanel() {
           value={Math.round(node.position[1] * 100) / 100}
         />
         <SliderControl
-          label="Z"
+          label={t('common.z')}
           max={50}
           min={-50}
           onChange={(v) => {
@@ -295,7 +295,7 @@ export default function RoofPanel() {
           value={Math.round(node.position[2] * 100) / 100}
         />
         <SliderControl
-          label="Rotation"
+          label={t('common.rotation')}
           max={180}
           min={-180}
           onChange={(degrees) => {

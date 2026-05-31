@@ -236,7 +236,7 @@ const PropertyLineSection = memo(function PropertyLineSection() {
             onClick={handleAddPoint}
           >
             <Plus className="h-3 w-3" />
-            Add point
+            {t('editor.addPoint')}
           </button>
         </div>
       )}
@@ -787,7 +787,7 @@ const LevelItem = memo(function LevelItem({
                   }}
                 >
                   <Camera className="h-3.5 w-3.5" />
-                  View snapshot
+                  {t('editor.viewSnapshot')}
                 </button>
               )}
               <button
@@ -838,7 +838,7 @@ const LevelItem = memo(function LevelItem({
               title={t('level.duplicateLevel')}
             >
               <Copy className="h-3.5 w-3.5" />
-              Duplicate
+              {t('common.duplicate')}
             </button>
             <button
               className="flex w-full cursor-pointer items-center gap-2 rounded px-3 py-1.5 text-left text-sm transition-colors hover:bg-accent"
@@ -1231,7 +1231,7 @@ const ZoneItem = memo(function ZoneItem({ zone, isLast }: { zone: ZoneNode; isLa
                   }}
                 >
                   <Camera className="h-3.5 w-3.5" />
-                  View snapshot
+                  {t('editor.viewSnapshot')}
                 </button>
               )}
               <button
@@ -1481,7 +1481,7 @@ const BuildingItem = memo(function BuildingItem({
                   }}
                 >
                   <Camera className="h-3.5 w-3.5" />
-                  View snapshot
+                  {t('editor.viewSnapshot')}
                 </button>
               )}
               <button

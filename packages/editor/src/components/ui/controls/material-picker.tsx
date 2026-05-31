@@ -10,6 +10,7 @@ import {
   toLibraryMaterialRef,
 } from '@pascal-app/core'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from '../../../lib/i18n'
 import useEditor from '../../../store/use-editor'
 
 type MaterialPickerProps = {
@@ -22,9 +23,12 @@ type MaterialPickerProps = {
   hideSideControl?: boolean
 }
 
-function getCategoryLabel(category: (typeof MATERIAL_CATEGORIES)[number]) {
-  if (category === 'roof') return 'Roofing'
-  return category.charAt(0).toUpperCase() + category.slice(1)
+function getCategoryLabel(
+  category: (typeof MATERIAL_CATEGORIES)[number],
+  t: (key: string) => string,
+) {
+  if (category === 'roof') return t('materials.roof')
+  return t(`materials.${category}`)
 }
 
 export function MaterialPicker({
@@ -34,6 +38,7 @@ export function MaterialPicker({
   onSelectMaterialPreset,
   disabled = false,
 }: MaterialPickerProps) {
+  const t = useTranslations()
   const setPaintPanelOpen = useEditor((state) => state.setPaintPanelOpen)
   const [showCustom, setShowCustom] = useState<boolean>(!!value?.properties)
   const [selectedCategory, setSelectedCategory] = useState<(typeof MATERIAL_CATEGORIES)[number]>(
@@ -161,7 +166,7 @@ export function MaterialPicker({
                   }}
                   type="button"
                 >
-                  {getCategoryLabel(category)}
+                  {getCategoryLabel(category, t)}
                 </button>
               ))}
             </div>
@@ -206,7 +211,7 @@ export function MaterialPicker({
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                   onClick={handleCustomOpen}
-                  title="Custom"
+                  title={t('editor.custom')}
                   type="button"
                 >
                   Custom

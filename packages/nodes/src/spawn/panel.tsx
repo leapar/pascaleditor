@@ -9,12 +9,14 @@ import {
   SliderControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Move, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 export default function SpawnPanel() {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const updateNode = useScene((s) => s.updateNode)
@@ -94,10 +96,10 @@ export default function SpawnPanel() {
   const storedRotationDegrees = Math.round((node.rotation * 180) / Math.PI)
 
   return (
-    <PanelWrapper icon="/icons/site.png" onClose={handleClose} title="Spawn Point" width={300}>
-      <PanelSection title="Position">
+    <PanelWrapper icon="/icons/site.png" onClose={handleClose} title={t('nodes.spawn.spawnPoint')} width={300}>
+      <PanelSection title={t('nodes.spawn.position')}>
         <SliderControl
-          label="X"
+          label={t('common.x')}
           max={node.position[0] + 2}
           min={node.position[0] - 2}
           onChange={(value) =>
@@ -109,7 +111,7 @@ export default function SpawnPanel() {
           value={Math.round(node.position[0] * 100) / 100}
         />
         <SliderControl
-          label="Y"
+          label={t('common.y')}
           max={node.position[1] + 2}
           min={node.position[1] - 2}
           onChange={(value) =>
@@ -121,7 +123,7 @@ export default function SpawnPanel() {
           value={Math.round(node.position[1] * 100) / 100}
         />
         <SliderControl
-          label="Z"
+          label={t('common.z')}
           max={node.position[2] + 2}
           min={node.position[2] - 2}
           onChange={(value) =>
@@ -134,9 +136,9 @@ export default function SpawnPanel() {
         />
       </PanelSection>
 
-      <PanelSection title="Facing">
+      <PanelSection title={t('nodes.spawn.facing')}>
         <SliderControl
-          label="Yaw"
+          label={t('nodes.spawn.yaw')}
           max={storedRotationDegrees + 90}
           min={storedRotationDegrees - 90}
           onChange={handleRotationChange}
@@ -148,13 +150,13 @@ export default function SpawnPanel() {
         />
       </PanelSection>
 
-      <PanelSection title="Actions">
+      <PanelSection title={t('common.actions')}>
         <ActionGroup>
-          <ActionButton icon={<Move className="h-4 w-4" />} label="Move" onClick={handleMove} />
+          <ActionButton icon={<Move className="h-4 w-4" />} label={t('common.move')} onClick={handleMove} />
           <ActionButton
             className="border-red-500/40 text-red-200 hover:bg-red-500/15"
             icon={<Trash2 className="h-4 w-4" />}
-            label="Delete"
+            label={t('common.delete')}
             onClick={handleDelete}
           />
         </ActionGroup>

@@ -15,7 +15,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import { getLevelDisplayName } from '../../../lib/level-name'
 import { createLocalGuideImage } from '../../../lib/local-guide-image'
-import { messages, useLocale } from '../../../lib/i18n'
+import { messages, useLocale, useTranslations } from '../../../lib/i18n'
 import { cn } from '../../../lib/utils'
 import useEditor, { type GridSnapStep } from '../../../store/use-editor'
 import { useUploadStore } from '../../../store/use-upload'
@@ -602,8 +602,7 @@ function ScansControl() {
 // ── Reference floor control ────────────────────────────────────────────────────────────────────
 
 function ReferenceFloorControl() {
-  const { locale } = useLocale()
-  const t = (key: string) => (messages[locale] as Record<string, string>)[key] || key
+  const t = useTranslations()
   const showReferenceFloor = useEditor((state) => state.showReferenceFloor)
   const toggleReferenceFloor = useEditor((state) => state.toggleReferenceFloor)
   const referenceFloorOffset = useEditor((state) => state.referenceFloorOffset)
@@ -629,8 +628,8 @@ function ReferenceFloorControl() {
           disabled={!hasLowerLevels}
           label={
             selectedLevelName && showReferenceFloor
-              ? `Reference floor: ${selectedLevelName}`
-              : 'Reference floor'
+              ? `${t('editor.referenceFloor')}: ${selectedLevelName}`
+              : t('editor.referenceFloor')
           }
           onClick={() => {
             if (hasLowerLevels) toggleReferenceFloor()
@@ -680,7 +679,7 @@ function ReferenceFloorControl() {
               <Layers2 className="h-4 w-4" />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-foreground text-sm">Reference floor</p>
+              <p className="font-medium text-foreground text-sm">{t('editor.referenceFloor')}</p>
               {selectedLevelName && (
                 <p className="truncate text-muted-foreground text-xs">{selectedLevelName}</p>
               )}

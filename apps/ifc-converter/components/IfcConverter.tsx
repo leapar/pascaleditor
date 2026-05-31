@@ -4,6 +4,7 @@ import { convertIfcToPascal, type PascalSceneGraph } from '@pascal-app/ifc-conve
 import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { availableTestFiles, exampleFileUrl, testFiles } from '@/lib/test-files'
+import { useTranslations } from '../../packages/editor/src/lib/i18n'
 
 // The viewer uses three's WebGPU renderer + the registry-driven scene
 // store, neither of which run during SSR — dynamic-import with ssr:false
@@ -32,6 +33,7 @@ function meta(node: { metadata?: unknown } | null | undefined): ConverterMetadat
 }
 
 export default function IfcConverter() {
+  const t = useTranslations()
   const [pascalData, setPascalData] = useState<PascalSceneGraph | null>(null)
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -687,7 +689,7 @@ export default function IfcConverter() {
               <button
                 onClick={copyJsonToClipboard}
                 className="text-gray-400 hover:text-white transition-colors p-1 hover:bg-gray-800 rounded"
-                title="Copy to clipboard"
+                title={t('editor.copyToClipboard')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -726,7 +728,7 @@ export default function IfcConverter() {
         <button
           onClick={() => setShowJson(true)}
           className="fixed right-6 top-24 bg-gray-900 text-white shadow-xl hover:bg-gray-800 transition-all z-10 group rounded-lg px-4 py-2"
-          title="Show JSON preview"
+          title={t('editor.showJsonPreview')}
         >
           <div className="flex items-center gap-2">
             {/* Curly braces icon */}

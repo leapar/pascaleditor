@@ -22,6 +22,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { guideEmitter } from '../../../lib/guide-events'
 import { getGuideImageName } from '../../../lib/local-guide-image'
+import { useTranslations } from '../../../lib/i18n'
 import useEditor from '../../../store/use-editor'
 import { ActionButton, ActionGroup } from '../controls/action-button'
 import { PanelSection } from '../controls/panel-section'
@@ -40,6 +41,7 @@ function getScaleStatus(guide: GuideNode, scaleReferenceVisible: boolean) {
 }
 
 export function ReferencePanel() {
+  const t = useTranslations()
   const selectedReferenceId = useEditor((s) => s.selectedReferenceId)
   const setSelectedReferenceId = useEditor((s) => s.setSelectedReferenceId)
   const guideUi = useEditor((s) =>
@@ -158,12 +160,12 @@ export function ReferencePanel() {
   return (
     <PanelWrapper
       onClose={handleClose}
-      title={node.name || (isScan ? '3D Scan' : 'Guide Image')}
+      title={node.name || (isScan ? t('editor.3dScan') : t('editor.guideImage'))}
       width={300}
     >
       {!isScan && (
         <>
-          <PanelSection title="Image">
+          <PanelSection title={t('editor.image')}>
             <input
               accept="image/*"
               className="hidden"
@@ -188,7 +190,7 @@ export function ReferencePanel() {
               <ActionButton
                 className="text-destructive hover:bg-destructive/10"
                 icon={<Trash2 className="h-3.5 w-3.5" />}
-                label="Delete"
+                label={t('editor.delete')}
                 onClick={handleDeleteGuide}
               />
             </ActionGroup>
@@ -231,7 +233,7 @@ export function ReferencePanel() {
             )}
           </PanelSection>
 
-          <PanelSection title="Reference Scale">
+          <PanelSection title={t('editor.referenceScale')}>
             <div className="flex items-center gap-2 rounded-md border border-border/50 bg-background/40 px-2.5 py-2 text-sm">
               <Ruler className="h-4 w-4 shrink-0 text-primary" />
               <span className="truncate text-muted-foreground">{scaleStatus}</span>
@@ -242,7 +244,7 @@ export function ReferencePanel() {
                 label={node.scaleReference ? 'Edit Scale' : 'Set Scale'}
                 onClick={handleStartScale}
               />
-              <ActionButton label="Cancel" onClick={handleCancelScale} />
+              <ActionButton label={t('editor.cancel')} onClick={handleCancelScale} />
             </ActionGroup>
 
             <ActionGroup>
@@ -256,17 +258,17 @@ export function ReferencePanel() {
               />
               <ActionButton
                 disabled={!node.scaleReference}
-                label="Clear Scale"
+                label={t('editor.clearScale')}
                 onClick={() => handleUpdate({ scaleReference: null } as Partial<GuideNode>)}
               />
             </ActionGroup>
           </PanelSection>
 
-          <PanelSection title="Quick Actions">
+          <PanelSection title={t('editor.quickActions')}>
             <ActionGroup>
               <ActionButton
                 icon={<LocateFixed className="h-3.5 w-3.5" />}
-                label="Center"
+                label={t('editor.center')}
                 onClick={() =>
                   handleUpdate({
                     position: [0, node.position[1], 0],
@@ -275,7 +277,7 @@ export function ReferencePanel() {
               />
               <ActionButton
                 icon={<RotateCcw className="h-3.5 w-3.5" />}
-                label="Reset Rotation"
+                label={t('editor.resetRotation')}
                 onClick={() =>
                   handleUpdate({
                     rotation: [node.rotation[0], 0, node.rotation[2]],
@@ -286,7 +288,7 @@ export function ReferencePanel() {
             <ActionGroup>
               <ActionButton
                 icon={<Ruler className="h-3.5 w-3.5" />}
-                label="Reset Image Scale"
+                label={t('editor.resetImageScale')}
                 onClick={() => handleUpdate({ scale: 1 } as Partial<GuideNode>)}
               />
             </ActionGroup>
@@ -294,7 +296,7 @@ export function ReferencePanel() {
         </>
       )}
 
-      <PanelSection title="Position">
+      <PanelSection title={t('editor.position')}>
         <SliderControl
           label={
             <>
@@ -351,7 +353,7 @@ export function ReferencePanel() {
         />
       </PanelSection>
 
-      <PanelSection title="Rotation">
+      <PanelSection title={t('editor.rotation')}>
         <SliderControl
           label={
             <>
@@ -373,7 +375,7 @@ export function ReferencePanel() {
         />
         <div className="flex gap-1.5 px-1 pt-2 pb-1">
           <ActionButton
-            label="-45°"
+            label={t('nodes.stair.rotationPresets.negative')}
             onClick={() =>
               handleUpdate({
                 rotation: [node.rotation[0], node.rotation[1] - Math.PI / 4, node.rotation[2]],
@@ -381,7 +383,7 @@ export function ReferencePanel() {
             }
           />
           <ActionButton
-            label="+45°"
+            label={t('nodes.stair.rotationPresets.positive')}
             onClick={() =>
               handleUpdate({
                 rotation: [node.rotation[0], node.rotation[1] + Math.PI / 4, node.rotation[2]],
@@ -391,7 +393,7 @@ export function ReferencePanel() {
         </div>
       </PanelSection>
 
-      <PanelSection title="Scale & Opacity">
+      <PanelSection title={t('editor.scaleAndOpacity')}>
         <SliderControl
           label={
             <>
@@ -411,7 +413,7 @@ export function ReferencePanel() {
         />
 
         <SliderControl
-          label="Opacity"
+          label={t('editor.opacity')}
           max={100}
           min={0}
           onChange={(v) => handleUpdate({ opacity: v })}

@@ -41,7 +41,7 @@ import {
   buildLevelDuplicateCreateOps,
   type LevelDuplicatePreset,
 } from '../../lib/level-duplication'
-import { useLocale, messages } from '../../lib/i18n'
+import { useLocale, messages, useTranslations } from '../../lib/i18n'
 import { getDefaultLevelName, getLevelDisplayName } from '../../lib/level-name'
 import { deleteLevelWithFallbackSelection } from '../../lib/level-selection'
 import {
@@ -220,7 +220,7 @@ function LevelRow({
                 type="button"
               >
                 <Copy className="h-3 w-3" />
-                Duplicate level
+                {t('editor.duplicateLevel')}
               </button>
               <button
                 className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-muted-foreground text-xs transition-colors hover:bg-white/10 hover:text-foreground"

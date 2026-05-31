@@ -180,7 +180,7 @@ export function CeilingPanel() {
         </div>
       </PanelSection>
 
-      <PanelSection title="Holes">
+      <PanelSection title={t('nodes.ceiling.holes')}>
         {node.holes && node.holes.length > 0 ? (
           <div className="flex flex-col gap-1 pb-2">
             {node.holes.map((hole, index) => {

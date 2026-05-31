@@ -1,6 +1,7 @@
 'use client'
 
 import useEditor from '../../../store/use-editor'
+import { useTranslations } from '../../../lib/i18n'
 import { PanelSection } from '../controls/panel-section'
 import { Input } from '../primitives/input'
 import { PanelWrapper } from './panel-wrapper'
@@ -20,6 +21,7 @@ function buildDefaultCustomMaterial() {
 }
 
 export function PaintPanel() {
+  const t = useTranslations()
   const activePaintMaterial = useEditor((state) => state.activePaintMaterial)
   const activePaintTarget = useEditor((state) => state.activePaintTarget)
   const setActivePaintMaterial = useEditor((state) => state.setActivePaintMaterial)
@@ -52,8 +54,8 @@ export function PaintPanel() {
   }
 
   return (
-    <PanelWrapper onClose={() => setPaintPanelOpen(false)} title="Material" width={320}>
-      <PanelSection title="Custom Material">
+    <PanelWrapper onClose={() => setPaintPanelOpen(false)} title={t('editor.material')} width={320}>
+      <PanelSection title={t('editor.customMaterial')}>
         <div className="space-y-3">
           <div className="space-y-2">
             <label className="block font-medium text-muted-foreground text-xs uppercase tracking-[0.12em]">

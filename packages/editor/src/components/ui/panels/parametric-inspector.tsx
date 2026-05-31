@@ -13,6 +13,7 @@ import { Icon } from '@iconify/react'
 import { Move, Trash2 } from 'lucide-react'
 import { type ComponentType, lazy, Suspense, useCallback } from 'react'
 import { sfxEmitter } from '../../../lib/sfx-bus'
+import { useTranslations } from '../../../lib/i18n'
 import useEditor from '../../../store/use-editor'
 import { ActionButton, ActionGroup } from '../controls/action-button'
 import { PanelSection } from '../controls/panel-section'
@@ -38,6 +39,7 @@ import { PanelWrapper } from './panel-wrapper'
  * can't be auto-generated (topology editors etc.).
  */
 export function ParametricInspector({ footer }: { footer?: React.ReactNode } = {}) {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0]) as AnyNodeId | undefined
   const setSelection = useViewer((s) => s.setSelection)
   // Subscribe only to the *type* — a string primitive that doesn't change
@@ -115,16 +117,16 @@ export function ParametricInspector({ footer }: { footer?: React.ReactNode } = {
         </PanelSection>
       ))}
       {(canMove || canDelete) && (
-        <PanelSection title="Actions">
+        <PanelSection title={t('editor.actions')}>
           <ActionGroup>
             {canMove && (
-              <ActionButton icon={<Move className="h-4 w-4" />} label="Move" onClick={handleMove} />
+              <ActionButton icon={<Move className="h-4 w-4" />} label={t('editor.move')} onClick={handleMove} />
             )}
             {canDelete && (
               <ActionButton
                 className="border-red-500/40 text-red-200 hover:bg-red-500/15"
                 icon={<Trash2 className="h-4 w-4" />}
-                label="Delete"
+                label={t('editor.delete')}
                 onClick={handleDelete}
               />
             )}

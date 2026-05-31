@@ -45,6 +45,7 @@ import {
 } from 'three'
 import { acceleratedRaycast, computeBoundsTree, disposeBoundsTree } from 'three-mesh-bvh'
 import '../../three-types'
+import { useTranslations } from '../../lib/i18n'
 import {
   closeDoorOpenState,
   DOOR_SWING_OPEN_ANGLE,
@@ -1297,6 +1298,7 @@ export const FirstPersonControls = () => {
  * Rendered as a regular DOM overlay (not inside the Canvas).
  */
 export const FirstPersonOverlay = ({ onExit }: { onExit: () => void }) => {
+  const t = useTranslations()
   const [isLocked, setIsLocked] = useState(false)
   const hasPlacedSpawn = useScene((state) =>
     Object.values(state.nodes).some((node) => node.type === 'spawn'),
@@ -1341,14 +1343,14 @@ export const FirstPersonOverlay = ({ onExit }: { onExit: () => void }) => {
           <kbd className="rounded border border-border/50 bg-accent/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
             ESC
           </kbd>
-          Exit Street View
+          {t('editor.exitStreetView')}
         </button>
       </div>
 
       {!hasPlacedSpawn && (
         <div className="absolute top-4 left-1/2 z-50 -translate-x-1/2">
           <div className="rounded-2xl border border-sky-300/35 bg-slate-950/88 px-4 py-2 text-center text-slate-100 text-sm shadow-lg backdrop-blur-xl">
-            Place a Spawn Point from the Build tab to control where walkthrough starts.
+            {t('viewer.spawnPointHint')}
           </div>
         </div>
       )}
@@ -1356,15 +1358,15 @@ export const FirstPersonOverlay = ({ onExit }: { onExit: () => void }) => {
       {isLocked && (
         <div className="pointer-events-none absolute top-1/2 right-6 z-40 -translate-y-1/2">
           <div className="flex min-w-[148px] flex-col gap-3 rounded-2xl border border-border/35 bg-background/80 px-4 py-4 shadow-lg backdrop-blur-xl">
-            <ControlHint keys={['W', 'A', 'S', 'D']} label="Move" />
+            <ControlHint keys={['W', 'A', 'S', 'D']} label={t('editor.move')} />
             <div className="h-px w-full bg-border/30" />
-            <InlineControlHint keyLabel="Space" label="Jump" />
-            <InlineControlHint keyLabel="Shift" label="Sprint" />
-            <InlineControlHint keyLabel="E / R" label="Interact" />
-            <InlineControlHint keyLabel="T" label="Close" />
+            <InlineControlHint keyLabel="Space" label={t('editor.jump')} />
+            <InlineControlHint keyLabel="Shift" label={t('editor.sprint')} />
+            <InlineControlHint keyLabel="E / R" label={t('editor.interact')} />
+            <InlineControlHint keyLabel="T" label={t('editor.close')} />
             <div className="h-px w-full bg-border/30" />
             <span className="text-center text-muted-foreground/60 text-xs">
-              Click to look around
+              {t('editor.clickToLookAround')}
             </span>
           </div>
         </div>

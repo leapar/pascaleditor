@@ -19,12 +19,14 @@ import {
   SliderControl,
   triggerSFX,
   useEditor,
+  useTranslations,
 } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 import { Spline } from 'lucide-react'
 import { useCallback, useMemo, useRef } from 'react'
 
 export default function WallPanel() {
+  const t = useTranslations()
   const selectedId = useViewer((s) => s.selection.selectedIds[0])
   const setSelection = useViewer((s) => s.setSelection)
   const setCurvingWall = useEditor((s) => s.setCurvingWall)
@@ -130,12 +132,12 @@ export default function WallPanel() {
     <PanelWrapper
       icon="/icons/wall.png"
       onClose={handleClose}
-      title={node.name || 'Wall'}
+      title={node.name || t('nodes.wall.fallbackTitle')}
       width={280}
     >
-      <PanelSection title="Dimensions">
+      <PanelSection title={t('nodes.wall.dimensions')}>
         <SliderControl
-          label="Length"
+          label={t('common.length')}
           max={20}
           min={0.1}
           onChange={handleUpdateLength}
@@ -145,7 +147,7 @@ export default function WallPanel() {
           value={length}
         />
         <SliderControl
-          label="Height"
+          label={t('common.height')}
           max={6}
           min={0.1}
           onChange={(v) => handleUpdate({ height: Math.max(0.1, v) })}
@@ -155,7 +157,7 @@ export default function WallPanel() {
           value={Math.round(height * 100) / 100}
         />
         <SliderControl
-          label="Thickness"
+          label={t('common.thickness')}
           max={1}
           min={0.05}
           onChange={(v) => handleUpdate({ thickness: Math.max(0.05, v) })}
@@ -166,7 +168,7 @@ export default function WallPanel() {
         />
         {!hasWallChildrenBlockingCurve && (
           <SliderControl
-            label="Curve"
+            label={t('nodes.wall.curve')}
             max={Math.max(0.01, maxCurveOffset)}
             min={-Math.max(0.01, maxCurveOffset)}
             onChange={(v) => handleUpdate({ curveOffset: normalizeWallCurveOffset(node, v) })}
@@ -179,11 +181,11 @@ export default function WallPanel() {
       </PanelSection>
 
       {!hasWallChildrenBlockingCurve && (
-        <PanelSection title="Actions">
+        <PanelSection title={t('common.actions')}>
           <ActionGroup>
             <ActionButton
               icon={<Spline className="h-3.5 w-3.5" />}
-              label="Curve"
+              label={t('nodes.wall.curve')}
               onClick={handleCurve}
             />
           </ActionGroup>

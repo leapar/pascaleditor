@@ -168,7 +168,7 @@ export function DormerPositionSection({
   return (
     <PanelSection title={t('common.position')}>
       <SliderControl
-        label="X"
+        label={t('common.x')}
         max={Math.round(worldMaxX * 10) / 10}
         min={Math.round(worldMinX * 10) / 10}
         onChange={(newWorldX) => {
@@ -184,7 +184,7 @@ export function DormerPositionSection({
         value={Math.round(worldX_now * 100) / 100}
       />
       <SliderControl
-        label="Z"
+        label={t('common.z')}
         max={Math.round(worldMaxZ * 10) / 10}
         min={Math.round(worldMinZ * 10) / 10}
         onChange={(newWorldZ) => {
@@ -200,7 +200,7 @@ export function DormerPositionSection({
         value={Math.round(worldZ_now * 100) / 100}
       />
       <SliderControl
-        label="Rotation"
+        label={t('common.rotate')}
         max={180}
         min={-180}
         onChange={(degrees) => {

@@ -98,7 +98,7 @@ export function DormerWindowSection({
           value={Math.round(node.windowHeight * 100) / 100}
         />
         <SliderControl
-          label="Offset X"
+          label={t('nodes.dormer.windowOffsetX')}
           max={1}
           min={-1}
           onChange={(v) => previewProp({ windowOffsetX: v })}
@@ -110,7 +110,7 @@ export function DormerWindowSection({
           value={Math.round(node.windowOffsetX * 100) / 100}
         />
         <SliderControl
-          label="Offset Y"
+          label={t('nodes.dormer.windowOffsetY')}
           max={2}
           min={0}
           onChange={(v) => previewProp({ windowOffsetY: v })}
