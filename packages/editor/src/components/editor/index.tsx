@@ -440,7 +440,7 @@ function ShortcutSequence({ keys, t }: { keys: ShortcutKey[]; t: (key: string) =
 
 function CameraControlHintItem({ hint, t }: { hint: CameraControlHint; t: (key: string) => string }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-1.5 px-4 text-center first:pl-0 last:pr-0">
+    <div className="flex min-w-0 flex-col items-center gap-1.5 text-center">
       <span className="font-medium text-[10px] text-muted-foreground/60 tracking-[0.03em]">
         {t(hint.actionKey)}
       </span>
@@ -469,37 +469,40 @@ function ViewerCanvasControlsHint({
   const hints = isPreviewMode ? PREVIEW_CAMERA_CONTROL_HINTS : EDITOR_CAMERA_CONTROL_HINTS
 
   return (
-    <div className="pointer-events-none absolute top-14 left-1/2 z-40 max-w-[calc(100%-2rem)] -translate-x-1/2">
+    <div className="pointer-events-none absolute top-3 right-3 z-40">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            aria-label={t('editor.dismissCameraControlsHint')}
+            className="pointer-events-auto absolute -right-2 -top-2 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border/35 bg-background/90 text-muted-foreground/70 shadow-md transition-colors hover:bg-accent hover:text-foreground"
+            onClick={onDismiss}
+            type="button"
+          >
+            <Icon
+              aria-hidden="true"
+              color="currentColor"
+              height={12}
+              icon="lucide:x"
+              width={12}
+            />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" sideOffset={8}>
+          {t('editor.dismiss')}
+        </TooltipContent>
+      </Tooltip>
       <section
         aria-label={t('editor.cameraControlsHint')}
-        className="pointer-events-auto flex items-start gap-3 rounded-2xl border border-border/35 bg-background/90 px-3.5 py-2.5 shadow-elevation-4 backdrop-blur-xl"
+        className="pointer-events-auto flex flex-col items-center gap-2 rounded-2xl border border-border/35 bg-background/90 px-3.5 py-2.5 shadow-elevation-4 backdrop-blur-xl"
       >
-        <div className="grid min-w-0 flex-1 grid-cols-3 items-start divide-x divide-border/18">
-          {hints.map((hint) => (
-            <CameraControlHintItem hint={hint} key={hint.actionKey} t={t} />
+        <div className="flex w-full flex-col items-center gap-2 text-center">
+          {hints.map((hint, index) => (
+            <>
+              {index > 0 && <div className="h-px w-full bg-border/30" />}
+              <CameraControlHintItem hint={hint} key={hint.actionKey} t={t} />
+            </>
           ))}
         </div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              aria-label={t('editor.dismissCameraControlsHint')}
-              className="flex h-5 shrink-0 items-center justify-center self-center border-border/18 border-l pl-3 text-muted-foreground/70 transition-colors hover:text-foreground"
-              onClick={onDismiss}
-              type="button"
-            >
-              <Icon
-                aria-hidden="true"
-                color="currentColor"
-                height={14}
-                icon="lucide:x"
-                width={14}
-              />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" sideOffset={8}>
-            {t('editor.dismiss')}
-          </TooltipContent>
-        </Tooltip>
       </section>
     </div>
   )

@@ -35,12 +35,12 @@ export function ScenesList({ scenes }: { scenes: SceneMeta[] }) {
             <span className="text-muted-foreground">/</span>
             <span className="font-medium text-foreground">{t('nav.scenes')}</span>
           </nav>
-          <CreateSceneButton />
+          <CreateSceneButton label={t('editor.createNew')} />
         </div>
       </header>
 
       <main className="container mx-auto max-w-5xl px-6 py-12">
-        <h1 className="mb-2 font-bold text-3xl">{t('scenes.title')}</h1>
+        <h1 className="mb-2 font-bold text-3xl text-foreground">{t('scenes.title')}</h1>
         <p className="mb-8 text-muted-foreground text-sm">
           {scenes.length === 0
             ? t('scenes.noScenes')
@@ -49,9 +49,9 @@ export function ScenesList({ scenes }: { scenes: SceneMeta[] }) {
 
         {scenes.length === 0 ? (
           <div className="rounded-xl border border-border/60 border-dashed bg-background p-12 text-center">
-            <p className="text-muted-foreground text-sm">{t('scenes.noScenesSaved')}</p>
+            <p className="text-muted-foreground text-sm">{t('scenes.noScenes')}</p>
             <div className="mt-4 flex justify-center">
-              <CreateSceneButton />
+              <CreateSceneButton label={t('editor.createNew')} />
             </div>
           </div>
         ) : (
