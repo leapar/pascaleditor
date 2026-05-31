@@ -6,7 +6,13 @@ import en from './i18n/en.json'
 import zh from './i18n/zh.json'
 
 export type Locale = 'en' | 'zh'
-export const defaultLocale: Locale = 'zh'
+
+function getDefaultLocale(): Locale {
+  const browserLang = navigator.language.toLowerCase()
+  return browserLang.startsWith('zh') ? 'zh' : 'en'
+}
+
+export const defaultLocale: Locale = getDefaultLocale()
 
 const messages: Record<Locale, Record<string, string>> = { en, zh }
 
@@ -37,20 +43,11 @@ export function useTranslations() {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale)
-
-  useEffect(() => {
-    const browserLang = navigator.language.toLowerCase()
-    if (browserLang.startsWith('zh')) {
-      setLocale('zh')
-    } else {
-      setLocale('en')
-    }
-  }, [])
+  const [locale, setLocale] = useState<Locale>(getDefaultLocale())
 
   return (
     <I18nContext.Provider value={{ locale, setLocale }}>
-      <IntlProvider messages={messages[locale]} locale={locale} defaultLocale="zh">
+      <IntlProvider messages={messages[locale]} locale={locale} defaultLocale={locale}>
         {children}
       </IntlProvider>
     </I18nContext.Provider>
