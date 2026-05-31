@@ -1,7 +1,10 @@
 'use client'
 
 import { Editor, FilePanel, ItemsPanel, useLocale, messages } from '@pascal-app/editor'
-import { Hexagon, Boxes, Cog, FileText } from 'lucide-react'
+import { Boxes } from 'lucide-react'
+import { SceneIcon } from '@/components/icons/scene-icon'
+import { FileIcon } from '@/components/icons/file-icon'
+import { SettingsIcon } from '@/components/icons/settings-icon'
 import {
   CommunityViewerToolbarLeft,
   CommunityViewerToolbarRight,
@@ -13,16 +16,16 @@ const SIDEBAR_TABS = [
     labelKey: 'sidebar.file',
     component: FilePanel,
     mobileDefaultSnap: 0.5,
-    mobileIcon: <FileText className="h-5 w-5" />,
-    icon: <FileText className="h-6 w-6" />,
+    mobileIcon: <FileIcon className="h-5 w-5" />,
+    icon: <FileIcon className="h-6 w-6" />,
   },
   {
     id: 'site',
     labelKey: 'sidebar.scene',
     component: () => null,
     mobileDefaultSnap: 0.5,
-    mobileIcon: <Hexagon className="h-5 w-5" />,
-    icon: <Hexagon className="h-6 w-6" />,
+    mobileIcon: <SceneIcon className="h-5 w-5" />,
+    icon: <SceneIcon className="h-6 w-6" />,
   },
   {
     id: 'items',
@@ -37,8 +40,8 @@ const SIDEBAR_TABS = [
     labelKey: 'common.settings',
     component: () => null,
     mobileDefaultSnap: 0.5,
-    mobileIcon: <Cog className="h-5 w-5" />,
-    icon: <Cog className="h-6 w-6" />,
+    mobileIcon: <SettingsIcon className="h-5 w-5" />,
+    icon: <SettingsIcon className="h-6 w-6" />,
   },
 ]
 
