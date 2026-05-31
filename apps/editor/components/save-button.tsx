@@ -1,6 +1,7 @@
 'use client'
 
 import type { SceneGraph } from '@pascal-app/editor'
+import { useLocale, messages } from '@pascal-app/editor'
 import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
@@ -16,11 +17,17 @@ interface SaveButtonProps {
   getGraph: () => SceneGraph | null
 }
 
+const t = (key: string, locale: string) => {
+  const msgs = messages[locale] as Record<string, string>
+  return msgs[key] || key
+}
+
 /**
  * Creates a new empty scene and navigates the user to it.
  */
-export function CreateSceneButton({ label = 'Create new scene' }: { label?: string } = {}) {
+export function CreateSceneButton({ label }: { label?: string } = {}) {
   const router = useRouter()
+  const { locale } = useLocale()
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,20 +38,20 @@ export function CreateSceneButton({ label = 'Create new scene' }: { label?: stri
       const response = await fetch('/api/scenes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Untitled scene', graph: EMPTY_GRAPH }),
+        body: JSON.stringify({ name: t('untitledScene', locale), graph: EMPTY_GRAPH }),
       })
       if (!response.ok) {
-        setError(`Failed to create scene (${response.status})`)
+        setError(`${t('failedToCreateScene', locale)} (${response.status})`)
         return
       }
       const meta = (await response.json()) as { id: string }
       router.push(`/scene/${meta.id}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create scene')
+      setError(err instanceof Error ? err.message : t('failedToCreateScene', locale))
     } finally {
       setIsCreating(false)
     }
-  }, [router])
+  }, [locale, router])
 
   return (
     <div className="flex items-center gap-3">
@@ -55,7 +62,7 @@ export function CreateSceneButton({ label = 'Create new scene' }: { label?: stri
         onClick={handleCreate}
         type="button"
       >
-        {isCreating ? 'Creating…' : label}
+        {isCreating ? t('creating', locale) : label ?? t('createNewScene', locale)}
       </button>
     </div>
   )
@@ -68,13 +75,14 @@ export function CreateSceneButton({ label = 'Create new scene' }: { label?: stri
  */
 export function SaveButton({ sceneId, name, version, getGraph }: SaveButtonProps) {
   const router = useRouter()
+  const { locale } = useLocale()
   const [isSaving, setIsSaving] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
 
   const handleSave = useCallback(async () => {
     const graph = getGraph()
     if (!graph) {
-      setStatus('No scene to save')
+      setStatus(t('noSceneToSave', locale))
       return
     }
     setIsSaving(true)
@@ -89,28 +97,28 @@ export function SaveButton({ sceneId, name, version, getGraph }: SaveButtonProps
         body: JSON.stringify({ name, graph }),
       })
       if (response.status === 409) {
-        setStatus('Conflict — reload to continue')
+        setStatus(t('conflictReload', locale))
         return
       }
       if (!response.ok) {
-        setStatus(`Save failed (${response.status})`)
+        setStatus(`${t('saveFailed', locale)} (${response.status})`)
         return
       }
-      setStatus('Saved')
+      setStatus(t('saved', locale))
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Save failed')
+      setStatus(error instanceof Error ? error.message : t('saveFailed', locale))
     } finally {
       setIsSaving(false)
     }
-  }, [getGraph, name, sceneId, version])
+  }, [getGraph, locale, name, sceneId, version])
 
   const handleSaveAs = useCallback(async () => {
     const graph = getGraph()
     if (!graph) {
-      setStatus('No scene to save')
+      setStatus(t('noSceneToSave', locale))
       return
     }
-    const newName = typeof window !== 'undefined' ? window.prompt('New scene name', name) : null
+    const newName = typeof window !== 'undefined' ? window.prompt(t('newSceneName', locale), name) : null
     if (!newName) return
     setIsSaving(true)
     setStatus(null)
@@ -121,17 +129,17 @@ export function SaveButton({ sceneId, name, version, getGraph }: SaveButtonProps
         body: JSON.stringify({ name: newName, graph }),
       })
       if (!response.ok) {
-        setStatus(`Save-as failed (${response.status})`)
+        setStatus(`${t('saveAsFailed', locale)} (${response.status})`)
         return
       }
       const meta = (await response.json()) as { id: string }
       router.push(`/scene/${meta.id}`)
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : 'Save-as failed')
+      setStatus(error instanceof Error ? error.message : t('saveAsFailed', locale))
     } finally {
       setIsSaving(false)
     }
-  }, [getGraph, name, router])
+  }, [getGraph, locale, name, router])
 
   return (
     <div className="flex items-center gap-2">
@@ -141,7 +149,7 @@ export function SaveButton({ sceneId, name, version, getGraph }: SaveButtonProps
         onClick={handleSave}
         type="button"
       >
-        {isSaving ? 'Saving…' : 'Save'}
+        {isSaving ? t('saving', locale) : t('save', locale)}
       </button>
       <button
         className="rounded-md border border-border bg-background px-3 py-1.5 font-medium text-xs hover:bg-accent/40 disabled:opacity-50"
@@ -149,7 +157,7 @@ export function SaveButton({ sceneId, name, version, getGraph }: SaveButtonProps
         onClick={handleSaveAs}
         type="button"
       >
-        Save as…
+        {t('saveAs', locale)}
       </button>
       {status && <span className="text-muted-foreground text-xs">{status}</span>}
     </div>
