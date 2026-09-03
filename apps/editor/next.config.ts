@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   ...(portableBuild
     ? { output: 'standalone' as const, outputFileTracingRoot: path.join(appDirectory, '../..') }
     : {}),
+  // Next.js 16 默认只允许 `localhost` 作为 dev origin;openbim Electron 通过 127.0.0.1:3002
+  // 加载 pascal,需要把 127.0.0.1 / [::1] 也加入白名单,否则 dev chunk / RSC payload 被 cross-origin 拦截,
+  // 表现为页面 SSR HTML 正常渲染但客户端 useEffect 不执行(console.log 不打印)。
+  allowedDevOrigins: ['127.0.0.1', '[::1]', 'localhost'],
   logging: {
     browserToTerminal: true,
   },
