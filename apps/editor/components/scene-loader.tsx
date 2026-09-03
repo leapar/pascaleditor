@@ -10,6 +10,7 @@ import {
   type SidebarTab,
   useTranslations,
 } from '@pascal-app/editor'
+import { glbToSceneGraph } from '@pascal-app/editor/lib/glb-import'
 import { Hammer, Layers, Settings } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -19,6 +20,7 @@ import { countGraphNodes, isEmptyGraphOverwrite } from '@/lib/empty-graph-guard'
 import { type PersistedSceneGraph, sceneGraphSignature } from '@/lib/scene-signature'
 import { cn } from '@/lib/utils'
 import { BuildTab } from './build-tab'
+import { SaveToOpenBimButton } from './save-to-openbim-button'
 import { CommunityViewerToolbarLeft, CommunityViewerToolbarRight } from './viewer-toolbar'
 
 export interface SceneMeta {
@@ -245,6 +247,48 @@ export function SceneLoader({ initialScene, meta }: SceneLoaderProps) {
     [t],
   )
 
+  // openbim integration: when the BrowserWindow was opened from openbim's
+  // ✏️ button, the URL carries ?openbimProjectId=<pid>&openbimFileId=<fid>.
+  // Auto-fetch the GLB from openbim service, convert it to a pascal
+  // SceneGraph via glb-import, and apply it to the editor store.
+  // Idempotent: runs once per (projectId, fileId) tuple per mount.
+  const openbimProjectId = searchParams.get('openbimProjectId')
+  const openbimFileId = searchParams.get('openbimFileId')
+  useEffect(() => {
+    if (!openbimProjectId || !openbimFileId) return
+    let cancelled = false
+    const run = async () => {
+      try {
+        // openbim service listens on loopback 127.0.0.1:21728 (Electron dev + prod 同一端点)
+        const rawUrl = `http://127.0.0.1:21728/projects/${encodeURIComponent(openbimProjectId)}/files/${encodeURIComponent(openbimFileId)}/raw`
+        const response = await fetch(rawUrl)
+        if (!response.ok) {
+          console.error(
+            `[openbim-bridge] Failed to fetch GLB: ${response.status} ${response.statusText} (${rawUrl})`,
+          )
+          return
+        }
+        const glbBuffer = await response.arrayBuffer()
+        if (cancelled) return
+        const filename =
+          response.headers.get('x-openbim-filename') ?? `${openbimFileId}.glb`
+        const graph = await glbToSceneGraph(glbBuffer, {
+          src: rawUrl,
+          name: filename,
+          category: 'openbim-glb',
+        })
+        if (cancelled) return
+        applySceneGraphToEditor(graph)
+      } catch (err) {
+        console.error('[openbim-bridge] GLB import failed:', err)
+      }
+    }
+    void run()
+    return () => {
+      cancelled = true
+    }
+  }, [openbimProjectId, openbimFileId])
+
   return (
     <div className="relative h-screen w-screen">
       {conflict && (
@@ -295,6 +339,9 @@ export function SceneLoader({ initialScene, meta }: SceneLoaderProps) {
         >
           {t('scenes.allScenes')}
         </Link>
+        {openbimProjectId && openbimFileId && (
+          <SaveToOpenBimButton projectId={openbimProjectId} fileId={openbimFileId} />
+        )}
       </div>
       <Editor
         disablePostFx={lightPreview}
