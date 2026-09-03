@@ -254,14 +254,24 @@ export function SceneLoader({ initialScene, meta }: SceneLoaderProps) {
   // Idempotent: runs once per (projectId, fileId) tuple per mount.
   const openbimProjectId = searchParams.get('openbimProjectId')
   const openbimFileId = searchParams.get('openbimFileId')
+  console.log('[openbim-bridge] SceneLoader mounted, params:', {
+    openbimProjectId, openbimFileId,
+    rawSearch: typeof window !== 'undefined' ? window.location.search : '(SSR)',
+  })
   useEffect(() => {
-    if (!openbimProjectId || !openbimFileId) return
+    if (!openbimProjectId || !openbimFileId) {
+      console.log('[openbim-bridge] no openbim params, skip GLB import')
+      return
+    }
+    console.log('[openbim-bridge] starting GLB import...')
     let cancelled = false
     const run = async () => {
       try {
         // openbim service listens on loopback 127.0.0.1:21728 (Electron dev + prod 同一端点)
         const rawUrl = `http://127.0.0.1:21728/projects/${encodeURIComponent(openbimProjectId)}/files/${encodeURIComponent(openbimFileId)}/raw`
+        console.log('[openbim-bridge] fetching', rawUrl)
         const response = await fetch(rawUrl)
+        console.log('[openbim-bridge] fetch response', response.status, response.statusText)
         if (!response.ok) {
           console.error(
             `[openbim-bridge] Failed to fetch GLB: ${response.status} ${response.statusText} (${rawUrl})`,
@@ -270,15 +280,19 @@ export function SceneLoader({ initialScene, meta }: SceneLoaderProps) {
         }
         const glbBuffer = await response.arrayBuffer()
         if (cancelled) return
+        console.log('[openbim-bridge] got GLB bytes:', glbBuffer.byteLength)
         const filename =
           response.headers.get('x-openbim-filename') ?? `${openbimFileId}.glb`
+        console.log('[openbim-bridge] glbToSceneGraph...')
         const graph = await glbToSceneGraph(glbBuffer, {
           src: rawUrl,
           name: filename,
           category: 'openbim-glb',
         })
         if (cancelled) return
+        console.log('[openbim-bridge] graph nodes:', Object.keys(graph.nodes).length, 'rootNodeIds:', graph.rootNodeIds)
         applySceneGraphToEditor(graph)
+        console.log('[openbim-bridge] applied to editor')
       } catch (err) {
         console.error('[openbim-bridge] GLB import failed:', err)
       }
