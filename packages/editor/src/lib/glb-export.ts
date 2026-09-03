@@ -1067,6 +1067,15 @@ function stampIdentity(
     // Stamp a human label for every node (catalog name for items, a type label
     // otherwise) so the viewer breadcrumb/hover read names, not raw pascalIds.
     extras.label = nodeDisplayLabel(node)
+    // M8.2 openbim integration: preserve the IFC class stamp so the re-imported
+    // GLB still routes meshes to WallNode / SlabNode / DoorNode / WindowNode
+    // (instead of falling back to ItemNode for every mesh).
+    const nodeMetadata = (node as { metadata?: Record<string, unknown> }).metadata
+    if (nodeMetadata?.openbimOriginalIfcClass) {
+      extras.ifc_class = nodeMetadata.openbimOriginalIfcClass
+      extras.openbimImportKind = nodeMetadata.openbimImportKind
+      extras.openbimGlbImport = nodeMetadata.openbimGlbImport
+    }
     // Camera bookmarks ride on the identity node (any kind can carry one) so the
     // baked viewer flies to a saved pose on selection without a side file.
     if (node.camera) extras.camera = node.camera
