@@ -42,14 +42,16 @@ async function makeGlbArrayBuffer(
  size: [number, number, number]
  ifcClass?: string
  position?: [number, number, number]
+ name?: string
 }>,
 ): Promise<ArrayBuffer> {
  const root = new THREE.Group()
- for (const { size, ifcClass, position } of meshes) {
+ for (const { size, ifcClass, position, name } of meshes) {
  const geometry = new THREE.BoxGeometry(size[0], size[1], size[2])
  // Shift so origin is at min corner: BoxGeometry is centered at (0,0,0)
  geometry.translate(size[0] / 2, size[1] / 2, size[2] / 2)
  const mesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ color: '#888888' }))
+ if (name) mesh.name = name
  if (ifcClass) {
  mesh.userData = { extras: { ifc_class: ifcClass } }
  }
@@ -280,5 +282,46 @@ describe('glbToSceneGraph (M8.2 decompose)', () => {
  expect(byType(graph.nodes, 'window')).toHaveLength(1)
  // site/building/level + 2 walls + 1 slab + 1 door + 1 window = 8
  expect(Object.keys(graph.nodes)).toHaveLength(8)
+ })
+
+ test('preserves GLB mesh.name on decomposed nodes (sidebar label + debug metadata)', async () => {
+ // Simulate openbim bonsai_load output: mesh.name carries IFC entity Name (含 system/wall 后缀),
+ // mesh.userData.extras.ifc_class carries IFC class. 验证 pascal 端原样保留,sidebar 能直接看到
+ // "Wall_0_0_interior" / "RoofSlab" / "Pipe_0_water_supply" 跟 GLB 一一对应。
+ const glb = await makeGlbArrayBuffer([
+ { size: [5, 2.8, 0.24], ifcClass: 'IfcWallStandardCase', name: 'Wall_0_0_interior' },
+ { size: [5, 2.8, 0.24], ifcClass: 'IfcWallStandardCase', name: 'Wall_1_0_interior' },
+ { size: [5, 0.15, 4], ifcClass: 'IfcSlab', name: 'FloorSlab' },
+ { size: [5, 0.12, 4], ifcClass: 'IfcSlab', name: 'RoofSlab' },
+ { size: [4.02, 0.02, 0.02], ifcClass: 'IfcPipeSegment', name: 'Pipe_0_water_supply' },
+ ])
+ const graph = await glbToSceneGraph(glb, { name: 'mep-basic.glb' })
+
+ // Wall 节点: name + metadata.openbimOriginalName 都等于 mesh.name
+ const walls = byType(graph.nodes, 'wall')
+ expect(walls).toHaveLength(2)
+ for (const { node } of walls) {
+ expect(node.name).toBeTruthy()
+ expect(node.name).toMatch(/^Wall_\d+_0_interior$/)
+ const meta = node.metadata as { openbimOriginalName?: string }
+ expect(meta.openbimOriginalName).toBe(node.name)
+ }
+
+ // Slab 节点: FloorSlab / RoofSlab 都在 sidebar 直接显示
+ const slabs = byType(graph.nodes, 'slab')
+ expect(slabs).toHaveLength(2)
+ const slabNames = slabs.map((s) => s.node.name).sort()
+ expect(slabNames).toEqual(['FloorSlab', 'RoofSlab'])
+ for (const { node } of slabs) {
+ const meta = node.metadata as { openbimOriginalName?: string }
+ expect(meta.openbimOriginalName).toBe(node.name)
+ }
+
+ // ItemNode fallback (MEP): 同样保留 mesh.name
+ const items = byType(graph.nodes, 'item')
+ expect(items).toHaveLength(1)
+ expect(items[0]!.node.name).toBe('Pipe_0_water_supply')
+ const itemMeta = items[0]!.node.metadata as { openbimOriginalName?: string }
+ expect(itemMeta.openbimOriginalName).toBe('Pipe_0_water_supply')
  })
 })
