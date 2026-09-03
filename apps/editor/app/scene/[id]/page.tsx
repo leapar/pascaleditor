@@ -1,6 +1,7 @@
 import type { SceneGraph } from '@pascal-app/editor'
 import { headers } from 'next/headers'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { SceneLoader, type SceneMeta } from '@/components/scene-loader'
 
 export const dynamic = 'force-dynamic'
@@ -69,5 +70,23 @@ export default async function ScenePage({ params }: { params: Promise<{ id: stri
   }
 
   const { graph, ...meta } = scene
-  return <SceneLoader initialScene={graph} meta={meta} />
+  // SceneLoader 内 useSearchParams 拿 ?openbimProjectId / ?openbimFileId
+  // Next.js 16 + React 19 强制要求 useSearchParams 包 Suspense boundary,
+  // 否则整个 client tree 不挂载,useEffect (GLB auto-import) 不跑,scene
+  // 永远显示 stub 空场景。
+  return (
+    <Suspense fallback={<SceneLoaderFallback />}>
+      <SceneLoader initialScene={graph} meta={meta} />
+    </Suspense>
+  )
+}
+
+function SceneLoaderFallback() {
+  return (
+    <div className="flex h-screen w-screen items-center justify-center bg-background">
+      <div className="font-mono text-muted-foreground text-xs uppercase tracking-wide">
+        Loading scene…
+      </div>
+    </div>
+  )
 }
